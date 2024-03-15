@@ -1,7 +1,12 @@
 @import "colors";
 
+$btn-padding-y: 0.5rem;
+$btn-padding-y-small: 0.3rem;
+$btn-padding-x: 2rem;
+$btn-padding-x-small: 1rem;
+
 @mixin btnStyle {
-  padding: 0.5rem 2rem;
+  padding: $btn-padding-y $btn-padding-x;
   background: $white-color;
   border: 1px solid $black-color;
   border-radius: 0.25rem;
@@ -18,7 +23,7 @@
   &__container {
     height: 21.875rem;
     width: 18.75rem;
-    padding: 0.5rem;
+    padding: $btn-padding-y;
     background: $white-color;
     display: flex;
     flex-direction: column;
@@ -36,7 +41,7 @@
   }
 
   &__btn {
-    padding: 0.3rem 2rem;
+    padding: $btn-padding-y-small $btn-padding-x;
     background: $gray-light--2;
     border: 1px solid $black-color;
     border-radius: 0.25rem;
@@ -64,7 +69,7 @@
     }
 
     @media screen and (max-width: 330px) {
-      padding: 0.3rem 1rem;
+      padding: $btn-padding-y-small $btn-padding-x-small;
     }
   }
 }
