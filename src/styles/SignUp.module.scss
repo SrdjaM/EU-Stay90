@@ -1,0 +1,49 @@
+@import "colors";
+
+.form {
+  width: 100%;
+  text-align: center;
+  max-height: 18rem;
+  overflow-y: auto;
+  margin-top: 0.5rem;
+
+  &-input {
+    width: 80%;
+    height: 24px;
+    margin-bottom: 0.5rem;
+    padding: 0.25rem;
+    border: 1px solid $gray-dark--1;
+    border-radius: 0.25rem;
+
+    &::placeholder {
+      font-size: 12px;
+      font-weight: 600;
+      color: $gray-light--1;
+      text-transform: capitalize;
+    }
+
+    &__error {
+      color: $error-color;
+      margin-bottom: 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+  }
+
+  &-btn__submit {
+    padding: 0.5rem 2rem;
+    margin-bottom: 0.5rem;
+    background: $gray-light--2;
+    border: 1px solid $black-color;
+    border-radius: 0.25rem;
+    color: $gray-dark--1;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover {
+      background-color: $gray-dark--1;
+      color: $white-color;
+      box-shadow: 2px 4px 4px $gray-light--1;
+    }
+  }
+}
