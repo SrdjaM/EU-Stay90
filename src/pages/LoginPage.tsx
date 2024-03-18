@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import SignIn from "../components/SignIn";
-import SignUp from "../components/SignUp";
 import classes from "../styles/LoginPage.module.scss";
 import AuthForm from "../components/AuthForm";
 

@@ -34,6 +34,7 @@ $btn-padding-x-small: 1rem;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    box-shadow: 2px 4px 6px $gray-light--1;
 
     @media screen and (max-width: 330px) {
       width: 15rem;

@@ -5,11 +5,11 @@ import {
   createUserWithEmailAndPassword,
 } from "firebase/auth";
 import { app } from "../firebase";
-import classes from "../styles/AuthForm.module.scss";
-import { object, string, ValidationError } from "yup";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "../firebase";
+import { object, string } from "yup";
 import { useAuth } from "../contexts/AuthContext";
+import classes from "../styles/AuthForm.module.scss";
 
 interface AuthFormProps {
   isSignIn: boolean;
@@ -144,9 +144,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ isSignIn, setIsSignIn }) => {
         confirmPassword: "",
       });
     } catch (error: any) {
-      console.log(error.code);
       if (error.code === "auth/invalid-credential") {
-        setError("Invalid email or password");
+        setError("Invalid email or password!");
       } else if (error.code === "auth/too-many-requests") {
         setError("Too many requests, try again later!");
       } else {
