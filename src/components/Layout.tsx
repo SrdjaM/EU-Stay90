@@ -1,5 +1,6 @@
 import React from "react";
 import { useAuth } from "../contexts/AuthContext";
+import HomePage from "../pages/HomePage";
 
 const Layout: React.FC = () => {
   const { logout } = useAuth();
@@ -12,6 +13,7 @@ const Layout: React.FC = () => {
       <h1>Layout</h1>
       <div>
         <button onClick={handleLogout}>Sign Out</button>
+        <HomePage />
       </div>
     </div>
   );
