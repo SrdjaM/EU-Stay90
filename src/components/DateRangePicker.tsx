@@ -6,6 +6,7 @@ import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
 interface Day {
   date: Date | null;
   dayOfMonth: number;
+  isInRange?: boolean;
 }
 
 const DateRangePicker: React.FC = () => {
@@ -28,6 +29,17 @@ const DateRangePicker: React.FC = () => {
 
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+
+  const formatDate = (date: Date) => {
+    const day = date.getDate();
+    const month = months[date.getMonth()];
+    const year = date.getFullYear();
+
+    return `${day} ${month} ${year}`;
+  };
 
   const generateDaysInMonth = (
     year: number,
@@ -56,6 +68,14 @@ const DateRangePicker: React.FC = () => {
       days.push({ date, dayOfMonth: i });
     }
 
+    days.forEach((day) => {
+      if (startDate && endDate && day.date) {
+        day.isInRange = day.date >= startDate && day.date <= endDate;
+      } else {
+        day.isInRange = false;
+      }
+    });
+
     return days;
   };
 
@@ -75,6 +95,34 @@ const DateRangePicker: React.FC = () => {
     setCurrentYear(newYear);
   };
 
+  const handleDayClick = (date: Date | null) => {
+    if (!startDate && !endDate) {
+      setStartDate(date);
+    } else if (startDate && !endDate && date && date > startDate) {
+      setEndDate(date);
+    } else {
+      setStartDate(date);
+      setEndDate(null);
+    }
+  };
+
+  const getNextMonthAndYear = (month: number, year: number) => {
+    const newMonth = month + 1;
+    if (newMonth > 11) {
+      return { month: 0, year: year + 1 };
+    }
+
+    return { month: newMonth, year };
+  };
+
+  const formattedStartDate = startDate ? formatDate(startDate) : "";
+  const formattedEndDate = endDate ? formatDate(endDate) : "";
+
+  const { month: nextMonth, year: nextYear } = getNextMonthAndYear(
+    currentMonth,
+    currentYear
+  );
+
   return (
     <div className={classes["date-range"]}>
       <div className={classes["date-range__days"]}>
@@ -83,6 +131,7 @@ const DateRangePicker: React.FC = () => {
             <button
               onClick={() => changeMonth(-1)}
               className={classes["date-range__btn-months"]}
+              aria-label="Go to previous month"
             >
               <FontAwesomeIcon icon={faAngleLeft} />
             </button>
@@ -104,7 +153,8 @@ const DateRangePicker: React.FC = () => {
                     day.date === null
                       ? classes["days-grid__day--previous-month"]
                       : ""
-                  }`}
+                  } ${day.isInRange ? classes["in-range"] : ""}`}
+                  onClick={() => handleDayClick(day.date)}
                 >
                   {day.dayOfMonth}
                 </div>
@@ -114,10 +164,11 @@ const DateRangePicker: React.FC = () => {
         </div>
         <div>
           <div className={classes["date-range__next-month"]}>
-            {`${months[currentMonth + 1]} ${currentYear}`}{" "}
+            {`${months[nextMonth]} ${nextYear}`}
             <button
               onClick={() => changeMonth(1)}
               className={`${classes["date-range__btn-months"]} ${classes.right}`}
+              aria-label="Go to next month"
             >
               <FontAwesomeIcon icon={faAngleRight} />
             </button>
@@ -139,7 +190,8 @@ const DateRangePicker: React.FC = () => {
                     day.date === null
                       ? classes["days-grid__day--previous-month"]
                       : ""
-                  }`}
+                  } ${day.isInRange ? classes["in-range"] : ""}`}
+                  onClick={() => handleDayClick(day.date)}
                 >
                   {day.dayOfMonth}
                 </div>
@@ -147,6 +199,23 @@ const DateRangePicker: React.FC = () => {
             )}
           </div>
         </div>
+      </div>
+      <div className={classes["picked-date"]}>
+        <input
+          type="text"
+          value={formattedStartDate}
+          placeholder="Start Date"
+          className={classes["picked-date__start-day"]}
+          readOnly
+        />
+
+        <input
+          type="text"
+          value={formattedEndDate}
+          placeholder="End Date"
+          className={classes["picked-date__end-day"]}
+          readOnly
+        />
       </div>
     </div>
   );
