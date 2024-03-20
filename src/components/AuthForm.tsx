@@ -10,6 +10,9 @@ import { db } from "../firebase";
 import { object, string } from "yup";
 import { useAuth } from "../contexts/AuthContext";
 import classes from "../styles/AuthForm.module.scss";
+import { FieldNames } from "../common/enums/FieldNames";
+import { ErrorMessage } from "../common/constants/errorMessage";
+import { ERROR_MESSAGES } from "../common/constants/constants";
 
 interface AuthFormProps {
   isSignIn: boolean;
@@ -64,24 +67,26 @@ const AuthForm: React.FC<AuthFormProps> = ({ isSignIn, setIsSignIn }) => {
     try {
       const fieldSchema = object().shape({
         username:
-          !isSignIn && name === "username"
-            ? string().required("Username is required")
+          !isSignIn && name === FieldNames.Username
+            ? string().required(ERROR_MESSAGES.USERNAME_REQUIRED)
             : string(),
         email:
-          name === "email"
-            ? string().email("Invalid email").required("Email is required")
+          name === FieldNames.Email
+            ? string()
+                .email(ERROR_MESSAGES.INVALID_EMAIL)
+                .required(ERROR_MESSAGES.EMAIL_REQUIRED)
             : string(),
         password:
-          name === "password"
+          name === FieldNames.Password
             ? string()
-                .min(6, "Password must be at least 6 characters")
-                .required("Password is required")
+                .min(6, ERROR_MESSAGES.PASSWORD_MIN_LENGTH)
+                .required(ERROR_MESSAGES.PASSWORD_REQUIRED)
             : string(),
         confirmPassword:
-          !isSignIn && name === "confirmPassword"
+          !isSignIn && name === FieldNames.ConfirmPassword
             ? string()
-                .oneOf([authData.password], "Passwords must match")
-                .required("Confirm password is required")
+                .oneOf([authData.password], ERROR_MESSAGES.PASSWORDS_MUST_MATCH)
+                .required(ERROR_MESSAGES.CONFIRM_PASSWORD_REQUIRED)
             : string(),
       });
 
@@ -158,6 +163,35 @@ const AuthForm: React.FC<AuthFormProps> = ({ isSignIn, setIsSignIn }) => {
     }
   };
 
+  const isFormValid = () => {
+    if (isSignIn) {
+      return authData.email && authData.password && errors.length === 0;
+    } else {
+      return (
+        authData.email &&
+        authData.password &&
+        authData.username &&
+        authData.confirmPassword &&
+        errors.length === 0
+      );
+    }
+  };
+
+  const renderErrorMessage = (fieldName: string, message: string) => {
+    return (
+      <div key={fieldName} className={classes["form-input__error"]}>
+        {message}
+      </div>
+    );
+  };
+
+  const renderFieldErrorMessage = (fieldName: string) => {
+    const error = errors.find((error) => error.fieldName === fieldName);
+    if (error) {
+      return renderErrorMessage(fieldName, error.message);
+    }
+    return null;
+  };
   return (
     <form onSubmit={handleSubmit} className={classes.form}>
       {!isSignIn && (
@@ -172,17 +206,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ isSignIn, setIsSignIn }) => {
             onBlur={handleBlur}
             className={classes["form-input"]}
           />
-          {errors.map(
-            (error) =>
-              error.fieldName === "username" && (
-                <div
-                  key={error.fieldName}
-                  className={classes["form-input__error"]}
-                >
-                  {error.message}
-                </div>
-              )
-          )}
+          {renderFieldErrorMessage("username")}
         </div>
       )}
       <div>
@@ -196,17 +220,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ isSignIn, setIsSignIn }) => {
           onBlur={handleBlur}
           className={classes["form-input"]}
         />
-        {errors.map(
-          (error) =>
-            error.fieldName === "email" && (
-              <div
-                key={error.fieldName}
-                className={classes["form-input__error"]}
-              >
-                {error.message}
-              </div>
-            )
-        )}
+        {renderFieldErrorMessage("email")}
       </div>
       <div>
         <input
@@ -219,17 +233,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ isSignIn, setIsSignIn }) => {
           onBlur={handleBlur}
           className={classes["form-input"]}
         />
-        {errors.map(
-          (error) =>
-            error.fieldName === "password" && (
-              <div
-                key={error.fieldName}
-                className={classes["form-input__error"]}
-              >
-                {error.message}
-              </div>
-            )
-        )}
+        {renderFieldErrorMessage("password")}
       </div>
       <div>
         {!isSignIn && (
@@ -244,21 +248,15 @@ const AuthForm: React.FC<AuthFormProps> = ({ isSignIn, setIsSignIn }) => {
               onBlur={handleBlur}
               className={classes["form-input"]}
             />
-            {errors.map(
-              (error) =>
-                error.fieldName === "confirmPassword" && (
-                  <div
-                    key={error.fieldName}
-                    className={classes["form-input__error"]}
-                  >
-                    {error.message}
-                  </div>
-                )
-            )}
+            {renderFieldErrorMessage("confirmPassword")}
           </div>
         )}
       </div>
-      <button type="submit" className={classes["form-btn__submit"]}>
+      <button
+        type="submit"
+        className={classes["form-btn__submit"]}
+        disabled={!isFormValid()}
+      >
         {isSignIn ? "Sign In" : "Sign Up"}
       </button>
       {error && <div className={classes["form-input__error"]}>{error}</div>}

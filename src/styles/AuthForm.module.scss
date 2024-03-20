@@ -57,5 +57,11 @@
     &:focus {
       outline: 2px solid $focus-color;
     }
+
+    &:disabled {
+      background-color: $error-color;
+      cursor: not-allowed;
+      color: $white-color;
+    }
   }
 }
