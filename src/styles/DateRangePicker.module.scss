@@ -13,11 +13,30 @@
   margin-top: 1rem;
   padding: 1rem 0.5rem;
   border: 2px solid $gray-light--2;
-  font-size: 14px;
+  font-size: 16px;
 
-  @media screen and (max-width: 330px) {
+  &::placeholder {
+    font-size: 16px;
+  }
+
+  @media screen and (max-width: 370px) {
     width: 120px;
   }
+}
+
+@mixin inputSpanStyle {
+  position: absolute;
+  top: 20px;
+  color: $gray-light--1;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+@mixin hoverSelected {
+  background-color: $primary-color;
+  transform: translateY(-2px);
+  box-shadow: 2px 4px 8px $gray-light--1;
 }
 
 $border-radus: 0.5rem;
@@ -84,12 +103,13 @@ $border-radus: 0.5rem;
       &--previous-month {
         color: $gray-light--1;
         pointer-events: none;
+        // color: transparent;
+        // border: none;
+        // box-shadow: none;
       }
 
       &:hover {
-        background-color: $primary-color;
-        transform: translateY(-2px);
-        box-shadow: 2px 4px 8px $gray-light--1;
+        @include hoverSelected();
       }
     }
   }
@@ -112,17 +132,29 @@ $border-radus: 0.5rem;
 }
 
 .picked-date {
+  position: relative;
   &__start-day {
     @include inputStyle();
     border-right: none;
     border-top-left-radius: $border-radus;
     border-bottom-left-radius: $border-radus;
+
+    &--span {
+      @include inputSpanStyle();
+      left: 10px;
+    }
   }
+
   &__end-day {
     @include inputStyle();
     border-left: none;
     border-top-right-radius: $border-radus;
     border-bottom-right-radius: $border-radus;
+
+    &--span {
+      @include inputSpanStyle();
+      left: 193px;
+    }
   }
 }
 
@@ -133,4 +165,12 @@ $border-radus: 0.5rem;
 
 .in-range {
   background-color: $primary-color;
+}
+
+.selected-day {
+  @include hoverSelected();
+}
+
+.test {
+  padding: 1.5rem 0.5rem 0.5rem;
 }

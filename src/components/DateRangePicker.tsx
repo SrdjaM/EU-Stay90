@@ -25,13 +25,15 @@ const DateRangePicker: React.FC = () => {
     "December",
   ];
 
-  const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
+
+  const [selectedDay, setSelectedDay] = useState<Date | null>(null);
 
   const formatDate = (date: Date) => {
     const day = date.getDate();
@@ -51,14 +53,19 @@ const DateRangePicker: React.FC = () => {
     const lastDayOfMonth = new Date(year, month + 1, 0);
     const lastDayOfPreviousMonth = new Date(year, month, 0);
 
+    let startingDayIndex = firstDayOfMonth.getDay();
+
+    if (startingDayIndex === 0) {
+      startingDayIndex = 7;
+    }
+
     if (includePreviousMonthDays) {
       const daysInPreviousMonth = lastDayOfPreviousMonth.getDate();
       for (
-        let i = daysInPreviousMonth - firstDayOfMonth.getDay() + 1;
+        let i = daysInPreviousMonth - startingDayIndex + 2;
         i <= daysInPreviousMonth;
         i++
       ) {
-        const date = new Date(year, month - 1, i);
         days.push({ date: null, dayOfMonth: i });
       }
     }
@@ -104,6 +111,7 @@ const DateRangePicker: React.FC = () => {
       setStartDate(date);
       setEndDate(null);
     }
+    setSelectedDay(date);
   };
 
   const getNextMonthAndYear = (month: number, year: number) => {
@@ -153,7 +161,13 @@ const DateRangePicker: React.FC = () => {
                     day.date === null
                       ? classes["days-grid__day--previous-month"]
                       : ""
-                  } ${day.isInRange ? classes["in-range"] : ""}`}
+                  } ${day.isInRange ? classes["in-range"] : ""} ${
+                    day.date &&
+                    selectedDay &&
+                    day.date.getTime() === selectedDay.getTime()
+                      ? classes["selected-day"]
+                      : ""
+                  }`}
                   onClick={() => handleDayClick(day.date)}
                 >
                   {day.dayOfMonth}
@@ -190,7 +204,13 @@ const DateRangePicker: React.FC = () => {
                     day.date === null
                       ? classes["days-grid__day--previous-month"]
                       : ""
-                  } ${day.isInRange ? classes["in-range"] : ""}`}
+                  } ${day.isInRange ? classes["in-range"] : ""} ${
+                    day.date &&
+                    selectedDay &&
+                    day.date.getTime() === selectedDay.getTime()
+                      ? classes["selected-day"]
+                      : ""
+                  }`}
                   onClick={() => handleDayClick(day.date)}
                 >
                   {day.dayOfMonth}
@@ -201,6 +221,11 @@ const DateRangePicker: React.FC = () => {
         </div>
       </div>
       <div className={classes["picked-date"]}>
+        {startDate && (
+          <span className={classes["picked-date__start-day--span"]}>
+            start date
+          </span>
+        )}
         <input
           type="text"
           value={formattedStartDate}
@@ -209,6 +234,11 @@ const DateRangePicker: React.FC = () => {
           readOnly
         />
 
+        {endDate && (
+          <span className={classes["picked-date__end-day--span"]}>
+            end date
+          </span>
+        )}
         <input
           type="text"
           value={formattedEndDate}
