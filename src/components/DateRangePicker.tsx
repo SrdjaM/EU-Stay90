@@ -167,8 +167,15 @@ const DateRangePicker: React.FC = () => {
                     day.date.getTime() === selectedDay.getTime()
                       ? classes["selected-day"]
                       : ""
+                  } ${
+                    selectedDay && day.date && day.date < selectedDay
+                      ? classes["disabled-day"]
+                      : ""
                   }`}
                   onClick={() => handleDayClick(day.date)}
+                  aria-label={`Select day ${
+                    day.date ? formatDate(day.date) : ""
+                  }`}
                 >
                   {day.dayOfMonth}
                 </div>
@@ -209,6 +216,10 @@ const DateRangePicker: React.FC = () => {
                     selectedDay &&
                     day.date.getTime() === selectedDay.getTime()
                       ? classes["selected-day"]
+                      : ""
+                  } ${
+                    selectedDay && day.date && day.date < selectedDay
+                      ? classes["disabled-day"]
                       : ""
                   }`}
                   onClick={() => handleDayClick(day.date)}

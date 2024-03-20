@@ -174,3 +174,10 @@ $border-radus: 0.5rem;
 .test {
   padding: 1.5rem 0.5rem 0.5rem;
 }
+
+.disabled-day {
+  pointer-events: none;
+  &:not(.in-range) {
+    opacity: 0.5;
+  }
+}
