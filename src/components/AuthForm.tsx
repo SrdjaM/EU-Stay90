@@ -1,23 +1,13 @@
 import React, { useEffect, useState } from "react";
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-} from "firebase/auth";
-import { app } from "../firebase";
-import { collection, addDoc } from "firebase/firestore";
-import { db } from "../firebase";
 import { object, string } from "yup";
-import { useAuth } from "../contexts/AuthContext";
 import classes from "../styles/AuthForm.module.scss";
 import { FieldNames } from "../common/enums/FieldNames";
-import { ErrorMessage } from "../common/constants/errorMessage";
 import { ERROR_MESSAGES } from "../common/constants/constants";
+import { useAuthentication } from "../common/hooks/AuthHooks";
+import { useLocation, useNavigate } from "react-router-dom";
+import Button from "./Button";
 
-interface AuthFormProps {
-  isSignIn: boolean;
-  setIsSignIn: (value: boolean) => void;
-}
+const PASSWORD_MIN_CHAR = 6;
 
 interface AuthData {
   username?: string;
@@ -31,16 +21,25 @@ type FormError = {
   message: string;
 };
 
-const AuthForm: React.FC<AuthFormProps> = ({ isSignIn, setIsSignIn }) => {
+const AuthForm: React.FC = () => {
   const [authData, setAuthData] = useState<AuthData>({
     email: "",
     password: "",
   });
 
   const [errors, setErrors] = useState<FormError[]>([]);
-  const [error, setError] = useState<string>("");
 
-  const { login } = useAuth();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const { signIn, signUp } = useAuthentication();
+
+  const location = useLocation();
+
+  let navigate = useNavigate();
+
+  const isSignIn = location.pathname === "/signin";
 
   useEffect(() => {
     setAuthData({
@@ -50,8 +49,16 @@ const AuthForm: React.FC<AuthFormProps> = ({ isSignIn, setIsSignIn }) => {
       confirmPassword: "",
     });
     setErrors([]);
-    setError("");
+    setErrorMessage(null);
   }, [isSignIn]);
+
+  useEffect(() => {
+    if (isSuccess) {
+      setTimeout(() => {
+        setIsSuccess(false);
+      }, 5000);
+    }
+  }, [isSuccess]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -79,7 +86,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ isSignIn, setIsSignIn }) => {
         password:
           name === FieldNames.Password
             ? string()
-                .min(6, ERROR_MESSAGES.PASSWORD_MIN_LENGTH)
+                .min(PASSWORD_MIN_CHAR, ERROR_MESSAGES.PASSWORD_MIN_LENGTH)
                 .required(ERROR_MESSAGES.PASSWORD_REQUIRED)
             : string(),
         confirmPassword:
@@ -102,63 +109,23 @@ const AuthForm: React.FC<AuthFormProps> = ({ isSignIn, setIsSignIn }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     try {
-      const schema = object().shape({
-        username: !isSignIn
-          ? string().required("Username is required")
-          : string().notRequired(),
-        email: string().email("Invalid email").required("Email is required"),
-        password: string().min(6, "Password must be at least 6 characters"),
-        confirmPassword: !isSignIn
-          ? string()
-              .oneOf([authData.password], "Passwords must match")
-              .required("Confirm password is required")
-          : string().notRequired(),
-      });
-
-      await schema.validate(authData, { abortEarly: false });
-
-      const auth = getAuth(app);
-
       if (isSignIn) {
-        await signInWithEmailAndPassword(
-          auth,
-          authData.email,
-          authData.password
-        );
-        login();
+        await signIn(authData);
+        navigate("/");
       } else {
-        await createUserWithEmailAndPassword(
-          auth,
-          authData.email,
-          authData.password
-        );
-        await addDoc(collection(db, "users"), {
-          username: authData.username,
-          email: authData.email,
-          password: authData.password,
-        });
-
-        setIsSignIn(true);
+        await signUp(authData);
+        setIsSuccess(true);
+        navigate("/signin");
       }
-
-      setAuthData({
-        email: "",
-        password: "",
-        username: "",
-        confirmPassword: "",
-      });
     } catch (error: any) {
-      if (error.code === "auth/invalid-credential") {
-        setError("Invalid email or password!");
-      } else if (error.code === "auth/too-many-requests") {
-        setError("Too many requests, try again later!");
-      } else {
-        const validationErrors: FormError[] = error.inner.map((err: any) => ({
-          fieldName: err.path as keyof AuthData,
-          message: err.message,
-        }));
-        setErrors(validationErrors);
+      if (error.message === "auth/invalid-credential") {
+        setErrorMessage(ERROR_MESSAGES.INVALID_EMAIL_OR_PASSWORD);
+      } else if (error.message === "auth/too-many-requests") {
+        setErrorMessage(ERROR_MESSAGES.TO_MANY_REQUESTS);
+      } else if (error.message === "auth/email-already-in-use") {
+        setErrorMessage(ERROR_MESSAGES.EMAIL_IN_USE);
       }
     }
   };
@@ -192,8 +159,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ isSignIn, setIsSignIn }) => {
     }
     return null;
   };
+
   return (
     <form onSubmit={handleSubmit} className={classes.form}>
+      {isSuccess && (
+        <div className={classes["success-message"]}>Successful sign up!</div>
+      )}
       {!isSignIn && (
         <div>
           <input
@@ -201,7 +172,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ isSignIn, setIsSignIn }) => {
             id="username"
             name="username"
             placeholder="Username"
-            value={authData.username}
+            value={authData.username || ""}
             onChange={handleInputChange}
             onBlur={handleBlur}
             className={classes["form-input"]}
@@ -243,7 +214,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ isSignIn, setIsSignIn }) => {
               id="confirmPassword"
               name="confirmPassword"
               placeholder="Confirm Password"
-              value={authData.confirmPassword}
+              value={authData.confirmPassword || ""}
               onChange={handleInputChange}
               onBlur={handleBlur}
               className={classes["form-input"]}
@@ -252,14 +223,14 @@ const AuthForm: React.FC<AuthFormProps> = ({ isSignIn, setIsSignIn }) => {
           </div>
         )}
       </div>
-      <button
-        type="submit"
-        className={classes["form-btn__submit"]}
-        disabled={!isFormValid()}
-      >
-        {isSignIn ? "Sign In" : "Sign Up"}
-      </button>
-      {error && <div className={classes["form-input__error"]}>{error}</div>}
+      <div className={classes["btn-container"]}>
+        <Button type="submit" variant="secondary" disabled={!isFormValid()}>
+          {isSignIn ? "Sign In" : "Sign Up"}
+        </Button>
+      </div>
+      {errorMessage && (
+        <div className={classes["form-input__error"]}>{errorMessage}</div>
+      )}
     </form>
   );
 };

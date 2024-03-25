@@ -1,105 +1,69 @@
 @import "colors";
-
-$btn-padding-y: 0.5rem;
-$btn-padding-y-small: 0.3rem;
-$btn-padding-x: 2rem;
-$btn-padding-x-small: 1rem;
+@import "_variables";
+@import "breakpoints";
+@import "mixins";
 
 @mixin btnStyle {
-  padding: $btn-padding-y $btn-padding-x;
+  padding: $padding-sm-lg;
   background: $white-color;
-  border: 1px solid $black-color;
-  border-radius: 0.25rem;
+  border: $thin-border;
+  border-radius: $border-radius-xs;
   color: $gray-dark--1;
   font-weight: 600;
   cursor: pointer;
   &:hover {
     background-color: $gray-light--3;
-    box-shadow: 2px 4px 4px $gray-light--1;
+    box-shadow: $box-shadow-lg;
   }
 }
 
 .login-page {
   &__container {
-    height: 21.875rem;
+    height: 23.75rem;
     width: 18.75rem;
-    padding: $btn-padding-y;
+    padding: $padding-xs;
     background: $white-color;
     display: flex;
     flex-direction: column;
     align-items: center;
-    border: 2px solid #000;
-    border-radius: 0.25rem;
+    border: $thick-border--dark;
+    border-radius: $border-radius-xs;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    box-shadow: 2px 4px 6px $gray-light--1;
+    box-shadow: $box-shadow-xl;
 
-    @media screen and (max-width: 330px) {
+    @include breakpoint-sm-and-lower {
       width: 15rem;
     }
   }
+}
 
-  &__btn {
-    padding: $btn-padding-y-small $btn-padding-x;
-    background: $gray-light--2;
-    border: 1px solid $black-color;
-    border-radius: 0.25rem;
-    color: $gray-dark--1;
+.signup {
+  &__container {
+    margin-top: 1.5rem;
+    text-align: center;
+  }
+
+  &__text {
+    font-size: 0.75rem;
+  }
+  &__link {
+    margin-left: 0.5rem;
+    color: $dark-blue--1;
+    font-size: 0.875rem;
     font-weight: 600;
-    cursor: pointer;
-    &:hover {
-      background-color: $gray-dark--1;
-      color: $white-color;
-      box-shadow: 2px 4px 4px $gray-light--1;
-    }
-    &.inactive {
-      background: $white-color;
-      color: $gray-dark--1;
-      border: 1px solid $gray-dark--1;
-      cursor: default;
-      border: none;
-      box-shadow: none;
-      &:focus {
-        outline: none;
-      }
-    }
-    &:focus {
-      outline: 2px solid $focus-color;
-    }
-
-    @media screen and (max-width: 330px) {
-      padding: $btn-padding-y-small $btn-padding-x-small;
-    }
   }
-}
-
-.button-container {
-  position: absolute;
-  top: 0;
-  left: 25px;
-  width: 80%;
-  transition: left 0.5s ease;
-  border: 1px solid $gray-dark--1;
-  border-radius: 4px;
-  padding: 4px;
-  margin-bottom: 0.5rem;
-
-  @media screen and (max-width: 330px) {
-    left: 20px;
-  }
-}
-
-.button-container button {
-  width: 50%;
-  float: left;
 }
 
 .btn-wrap {
   position: relative;
   width: 100%;
-  height: 45px;
-  display: flex;
-  align-items: center;
+  height: 2.8125rem;
+  text-align: center;
+}
+
+.welcome-back--message {
+  @include successTypography();
 }

@@ -1,44 +1,42 @@
-import React, { useState } from "react";
+import React from "react";
 import classes from "../styles/LoginPage.module.scss";
 import AuthForm from "../components/AuthForm";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
+import Button from "../components/Button";
 
 const LoginPage: React.FC = () => {
-  const [isSignIn, setIsSignIn] = useState(true);
+  let navigate = useNavigate();
 
   const handleSignIn = () => {
-    setIsSignIn(true);
+    navigate("/signin");
   };
 
-  const handleSignUp = () => {
-    setIsSignIn(false);
-  };
+  const location = useLocation();
+
+  const isSignIn = location.pathname === "/signin";
 
   return (
     <div className={classes["login-page__container"]}>
       <h2>{isSignIn ? "Login Form" : "Sign Up Form"}</h2>
-      <div className={classes["btn-wrap"]}>
-        <div className={classes["button-container"]}>
-          <button
-            onClick={handleSignIn}
-            className={`${classes["login-page__btn"]} ${
-              isSignIn ? classes["inactive"] : ""
-            }`}
-            aria-label="Sign In"
-          >
+      {!isSignIn ? (
+        <div className={classes["btn-wrap"]}>
+          <Button variant="primary" onClick={handleSignIn}>
             Login
-          </button>
-          <button
-            onClick={handleSignUp}
-            className={`${classes["login-page__btn"]} ${
-              !isSignIn ? classes["inactive"] : ""
-            }`}
-            aria-label="Sign Up"
-          >
-            Sign Up
-          </button>
+          </Button>
         </div>
-      </div>
-      <AuthForm isSignIn={isSignIn} setIsSignIn={setIsSignIn} />
+      ) : (
+        <div className={classes["welcome-back--message"]}>Welcome back!</div>
+      )}
+      <AuthForm />
+      {isSignIn && (
+        <div className={classes["signup__container"]}>
+          <span className={classes["signup__text"]}>Create an account</span>
+          <Link to={"/signup"} className={classes["signup__link"]}>
+            Sign up
+          </Link>
+        </div>
+      )}
     </div>
   );
 };

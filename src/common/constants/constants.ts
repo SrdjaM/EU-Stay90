@@ -10,4 +10,7 @@ export const ERROR_MESSAGES = {
   PASSWORD_MIN_LENGTH: `Password must be at least ${VALIDATION.PASSWORD_MIN_LENGTH} characters`,
   PASSWORDS_MUST_MATCH: "Passwords must match",
   CONFIRM_PASSWORD_REQUIRED: "Confirm password is required",
+  INVALID_EMAIL_OR_PASSWORD: "Invalid email or password!",
+  TO_MANY_REQUESTS: "Too many requests, try again later!",
+  EMAIL_IN_USE: "Email already  in use!",
 };
