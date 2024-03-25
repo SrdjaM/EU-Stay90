@@ -1,0 +1,23 @@
+@mixin breakpoint-sm-and-lower {
+  @media screen and (max-width: $breakpoint-sm) {
+    @content;
+  }
+}
+
+@mixin breakpoint-md-and-lower {
+  @media screen and (max-width: $breakpoint-md) {
+    @content;
+  }
+}
+
+@mixin breakpoint-lg-and-lower {
+  @media screen and (max-width: $breakpoint-lg) {
+    @content;
+  }
+}
+
+@mixin breakpoint-xl-and-lower {
+  @media screen and (max-width: $breakpoint-xl) {
+    @content;
+  }
+}

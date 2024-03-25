@@ -1,0 +1,23 @@
+@import "colors";
+@import "_variables";
+
+@mixin typography {
+  font-size: 0.75rem;
+  font-weight: $bold-fontweight;
+  color: $gray-light--1;
+  text-transform: capitalize;
+}
+
+@mixin errorTypography {
+  font-size: 0.75rem;
+  font-weight: $bold-fontweight;
+  color: $error-color;
+  margin-bottom: $margin-bottom-s;
+}
+
+@mixin successTypography {
+  font-size: 1rem;
+  font-weight: $bold-fontweight;
+  color: $light-blue--2;
+  margin-bottom: $margin-bottom-s;
+}
