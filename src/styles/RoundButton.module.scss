@@ -1,0 +1,15 @@
+@import "colors";
+
+.btn-round {
+  height: 2rem;
+  width: 2rem;
+  border: 2px solid $primary-color;
+  border-radius: 50%;
+  cursor: pointer;
+  position: absolute;
+  left: 0;
+
+  &:hover {
+    background-color: $secondary-color;
+  }
+}

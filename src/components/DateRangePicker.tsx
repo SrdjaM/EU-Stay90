@@ -1,7 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 import classes from "../styles/DateRangePicker.module.scss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useMonthYear } from "../custom/hooks/useMonthYear";
+import { useDateSelection } from "../custom/hooks/useDateSelection";
 import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
+import RoundButton from "../custom/components/RoundButton";
+import { formatDate } from "../custom/utils/dateUtils";
+
+const FIRST_DAY_OF_WEEK_INDEX = 0;
+const LAST_DAY_OF_WEEK_INDEX = 7;
+const OFFSET_TO_MONDAY = 2;
 
 interface Day {
   date: Date | null;
@@ -27,21 +34,10 @@ const DateRangePicker: React.FC = () => {
 
   const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
-  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
-
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
-
-  const [selectedDay, setSelectedDay] = useState<Date | null>(null);
-
-  const formatDate = (date: Date) => {
-    const day = date.getDate();
-    const month = months[date.getMonth()];
-    const year = date.getFullYear();
-
-    return `${day} ${month} ${year}`;
-  };
+  const { currentMonth, currentYear, changeMonth, getNextMonthAndYear } =
+    useMonthYear();
+  const { startDate, endDate, selectedDay, handleDayClick } =
+    useDateSelection();
 
   const generateDaysInMonth = (
     year: number,
@@ -55,24 +51,26 @@ const DateRangePicker: React.FC = () => {
 
     let startingDayIndex = firstDayOfMonth.getDay();
 
-    if (startingDayIndex === 0) {
-      startingDayIndex = 7;
+    if (startingDayIndex === FIRST_DAY_OF_WEEK_INDEX) {
+      startingDayIndex = LAST_DAY_OF_WEEK_INDEX;
     }
 
     if (includePreviousMonthDays) {
       const daysInPreviousMonth = lastDayOfPreviousMonth.getDate();
+
       for (
-        let i = daysInPreviousMonth - startingDayIndex + 2;
-        i <= daysInPreviousMonth;
-        i++
+        let dayIndex =
+          daysInPreviousMonth - startingDayIndex + OFFSET_TO_MONDAY;
+        dayIndex <= daysInPreviousMonth;
+        dayIndex++
       ) {
-        days.push({ date: null, dayOfMonth: i });
+        days.push({ date: null, dayOfMonth: dayIndex });
       }
     }
 
-    for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
-      const date = new Date(year, month, i);
-      days.push({ date, dayOfMonth: i });
+    for (let dayIndex = 1; dayIndex <= lastDayOfMonth.getDate(); dayIndex++) {
+      const date = new Date(year, month, dayIndex);
+      days.push({ date, dayOfMonth: dayIndex });
     }
 
     days.forEach((day) => {
@@ -86,147 +84,93 @@ const DateRangePicker: React.FC = () => {
     return days;
   };
 
-  const changeMonth = (increment: number) => {
-    let newMonth = currentMonth + increment;
-    let newYear = currentYear;
+  const { month: nextMonth, year: nextYear } = getNextMonthAndYear();
 
-    if (newMonth < 0) {
-      newMonth = 11;
-      newYear--;
-    } else if (newMonth > 11) {
-      newMonth = 0;
-      newYear++;
-    }
+  const formattedStartDate = startDate ? formatDate(startDate, months) : "";
+  const formattedEndDate = endDate ? formatDate(endDate, months) : "";
 
-    setCurrentMonth(newMonth);
-    setCurrentYear(newYear);
+  const renderDaysGrid = (days: Day[]) => {
+    return days.map((day, index) => {
+      const onDayClick = () => handleDayClick(day.date);
+
+      const dayClasses = [
+        classes["days-grid__day"],
+        day.date === null && classes["days-grid__day--previous-month"],
+        day.isInRange && classes["in-range"],
+        day.date &&
+          selectedDay &&
+          day.date.getTime() === selectedDay.getTime() &&
+          classes["selected-day"],
+        selectedDay &&
+          day.date &&
+          day.date < selectedDay &&
+          classes["disabled-day"],
+      ]
+        .filter(Boolean)
+        .join(" ");
+
+      return (
+        <div
+          key={day.date ? day.date.getTime() : `empty-${index}`}
+          className={dayClasses}
+          onClick={onDayClick}
+        >
+          {day.dayOfMonth}
+        </div>
+      );
+    });
   };
 
-  const handleDayClick = (date: Date | null) => {
-    if (!startDate && !endDate) {
-      setStartDate(date);
-    } else if (startDate && !endDate && date && date > startDate) {
-      setEndDate(date);
-    } else {
-      setStartDate(date);
-      setEndDate(null);
-    }
-    setSelectedDay(date);
+  const handlePreviousMonth = () => {
+    changeMonth(-1);
   };
 
-  const getNextMonthAndYear = (month: number, year: number) => {
-    const newMonth = month + 1;
-    if (newMonth > 11) {
-      return { month: 0, year: year + 1 };
-    }
-
-    return { month: newMonth, year };
+  const handleNextMonth = () => {
+    changeMonth(1);
   };
 
-  const formattedStartDate = startDate ? formatDate(startDate) : "";
-  const formattedEndDate = endDate ? formatDate(endDate) : "";
-
-  const { month: nextMonth, year: nextYear } = getNextMonthAndYear(
-    currentMonth,
-    currentYear
-  );
+  const renderDaysOfWeek = () => {
+    return daysOfWeek.map((day) => (
+      <div key={day} className={classes["days-of-week__day"]}>
+        {day}
+      </div>
+    ));
+  };
 
   return (
     <div className={classes["date-range"]}>
       <div className={classes["date-range__days"]}>
         <div>
           <div className={classes["date-range__current-month"]}>
-            <button
-              onClick={() => changeMonth(-1)}
-              className={classes["date-range__btn-months"]}
-              aria-label="Go to previous month"
-            >
-              <FontAwesomeIcon icon={faAngleLeft} />
-            </button>
+            <RoundButton
+              onButtonClick={handlePreviousMonth}
+              icon={faAngleLeft}
+              ariaLabel="Go to previous month"
+            />
             {`${months[currentMonth]} ${currentYear}`}
           </div>
-          <div className={classes["days-of-week"]}>
-            {daysOfWeek.map((day) => (
-              <div key={day} className={classes["days-of-week__day"]}>
-                {day}
-              </div>
-            ))}
-          </div>
+          <div className={classes["days-of-week"]}>{renderDaysOfWeek()}</div>
           <div className={classes["days-grid"]}>
-            {generateDaysInMonth(currentYear, currentMonth, true).map(
-              (day, index) => (
-                <div
-                  key={day.date ? day.date.getTime() : `empty-${index}`}
-                  className={`${classes["days-grid__day"]} ${
-                    day.date === null
-                      ? classes["days-grid__day--previous-month"]
-                      : ""
-                  } ${day.isInRange ? classes["in-range"] : ""} ${
-                    day.date &&
-                    selectedDay &&
-                    day.date.getTime() === selectedDay.getTime()
-                      ? classes["selected-day"]
-                      : ""
-                  } ${
-                    selectedDay && day.date && day.date < selectedDay
-                      ? classes["disabled-day"]
-                      : ""
-                  }`}
-                  onClick={() => handleDayClick(day.date)}
-                  aria-label={`Select day ${
-                    day.date ? formatDate(day.date) : ""
-                  }`}
-                >
-                  {day.dayOfMonth}
-                </div>
-              )
+            {renderDaysGrid(
+              generateDaysInMonth(currentYear, currentMonth, true)
             )}
           </div>
         </div>
         <div>
           <div className={classes["date-range__next-month"]}>
             {`${months[nextMonth]} ${nextYear}`}
-            <button
-              onClick={() => changeMonth(1)}
-              className={`${classes["date-range__btn-months"]} ${classes.right}`}
-              aria-label="Go to next month"
-            >
-              <FontAwesomeIcon icon={faAngleRight} />
-            </button>
+            <RoundButton
+              onButtonClick={handleNextMonth}
+              icon={faAngleRight}
+              ariaLabel="Go to next month"
+              className={classes.right}
+            />
           </div>
 
-          <div className={classes["days-of-week"]}>
-            {daysOfWeek.map((day) => (
-              <div key={day} className={classes["days-of-week__day"]}>
-                {day}
-              </div>
-            ))}
-          </div>
+          <div className={classes["days-of-week"]}>{renderDaysOfWeek()}</div>
           <div className={classes["days-grid"]}>
-            {generateDaysInMonth(currentYear, currentMonth + 1, true).map(
-              (day, index) => (
-                <div
-                  key={day.date ? day.date.getTime() : `empty-${index}`}
-                  className={`${classes["days-grid__day"]} ${
-                    day.date === null
-                      ? classes["days-grid__day--previous-month"]
-                      : ""
-                  } ${day.isInRange ? classes["in-range"] : ""} ${
-                    day.date &&
-                    selectedDay &&
-                    day.date.getTime() === selectedDay.getTime()
-                      ? classes["selected-day"]
-                      : ""
-                  } ${
-                    selectedDay && day.date && day.date < selectedDay
-                      ? classes["disabled-day"]
-                      : ""
-                  }`}
-                  onClick={() => handleDayClick(day.date)}
-                >
-                  {day.dayOfMonth}
-                </div>
-              )
+            {renderDaysGrid(
+              generateDaysInMonth(currentYear, currentMonth + 1, true)
             )}
           </div>
         </div>
