@@ -8,6 +8,7 @@ interface RoundButtonProps {
   icon: IconProp;
   ariaLabel: string;
   className?: string;
+  iconStyle?: string;
 }
 
 const RoundButton: React.FC<RoundButtonProps> = ({
@@ -15,6 +16,7 @@ const RoundButton: React.FC<RoundButtonProps> = ({
   icon,
   ariaLabel,
   className,
+  iconStyle,
 }) => {
   return (
     <button
@@ -22,7 +24,7 @@ const RoundButton: React.FC<RoundButtonProps> = ({
       className={`${classes["btn-round"]} ${className}`}
       aria-label={ariaLabel}
     >
-      <FontAwesomeIcon icon={icon} />
+      <FontAwesomeIcon icon={icon} className={iconStyle} />
     </button>
   );
 };

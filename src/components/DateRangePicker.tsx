@@ -2,13 +2,30 @@ import React from "react";
 import classes from "../styles/DateRangePicker.module.scss";
 import { useMonthYear } from "../custom/hooks/useMonthYear";
 import { useDateSelection } from "../custom/hooks/useDateSelection";
-import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
+import {
+  faAngleLeft,
+  faAngleRight,
+  faX,
+  faCheck,
+} from "@fortawesome/free-solid-svg-icons";
 import RoundButton from "../custom/components/RoundButton";
 import { formatDate } from "../custom/utils/dateUtils";
+
+import { db } from "../firebase";
+import { addDoc, collection } from "firebase/firestore";
+import { useUser } from "../contexts/UserContext";
+
+interface NewTrip {
+  userId: string;
+  startDate: string;
+  endDate: string;
+}
 
 const FIRST_DAY_OF_WEEK_INDEX = 0;
 const LAST_DAY_OF_WEEK_INDEX = 7;
 const OFFSET_TO_MONDAY = 2;
+const TO_PREVIOUS_MONTH = -1;
+const TO_NEXT_MONTH = 1;
 
 interface Day {
   date: Date | null;
@@ -36,8 +53,15 @@ const DateRangePicker: React.FC = () => {
 
   const { currentMonth, currentYear, changeMonth, getNextMonthAndYear } =
     useMonthYear();
-  const { startDate, endDate, selectedDay, handleDayClick } =
-    useDateSelection();
+  const {
+    startDate,
+    endDate,
+    selectedDay,
+    handleDayClick,
+    cancelSelectedDated,
+  } = useDateSelection();
+
+  const { userId } = useUser();
 
   const generateDaysInMonth = (
     year: number,
@@ -122,11 +146,11 @@ const DateRangePicker: React.FC = () => {
   };
 
   const handlePreviousMonth = () => {
-    changeMonth(-1);
+    changeMonth(TO_PREVIOUS_MONTH);
   };
 
   const handleNextMonth = () => {
-    changeMonth(1);
+    changeMonth(TO_NEXT_MONTH);
   };
 
   const renderDaysOfWeek = () => {
@@ -137,8 +161,67 @@ const DateRangePicker: React.FC = () => {
     ));
   };
 
+  const handleConfirmDates = async () => {
+    try {
+      if (startDate && endDate) {
+        const newTrip: NewTrip = {
+          userId: userId || "",
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString(),
+        };
+
+        await addDoc(collection(db, "trips"), newTrip);
+
+        cancelSelectedDated();
+      }
+    } catch (error) {
+      console.error("Error adding trip:", error);
+    }
+  };
+
   return (
     <div className={classes["date-range"]}>
+      <div className={classes["picked-date"]}>
+        {startDate && (
+          <span className={classes["picked-date__start-day--span"]}>
+            start date
+          </span>
+        )}
+        <input
+          type="text"
+          value={formattedStartDate}
+          placeholder="Start Date"
+          className={classes["picked-date__start-day"]}
+          readOnly
+        />
+
+        {endDate && (
+          <span className={classes["picked-date__end-day--span"]}>
+            end date
+          </span>
+        )}
+        <input
+          type="text"
+          value={formattedEndDate}
+          placeholder="End Date"
+          className={classes["picked-date__end-day"]}
+          readOnly
+        />
+        <div className={classes["btn-container"]}>
+          <RoundButton
+            onButtonClick={handleConfirmDates}
+            icon={faCheck}
+            ariaLabel="Confirm dates"
+          />
+        </div>
+        <div className={classes["btn-container"]}>
+          <RoundButton
+            onButtonClick={cancelSelectedDated}
+            icon={faX}
+            ariaLabel="Cancel dates"
+          />
+        </div>
+      </div>
       <div className={classes["date-range__days"]}>
         <div>
           <div className={classes["date-range__current-month"]}>
@@ -146,6 +229,7 @@ const DateRangePicker: React.FC = () => {
               onButtonClick={handlePreviousMonth}
               icon={faAngleLeft}
               ariaLabel="Go to previous month"
+              className={classes.left}
             />
             {`${months[currentMonth]} ${currentYear}`}
           </div>
@@ -174,33 +258,6 @@ const DateRangePicker: React.FC = () => {
             )}
           </div>
         </div>
-      </div>
-      <div className={classes["picked-date"]}>
-        {startDate && (
-          <span className={classes["picked-date__start-day--span"]}>
-            start date
-          </span>
-        )}
-        <input
-          type="text"
-          value={formattedStartDate}
-          placeholder="Start Date"
-          className={classes["picked-date__start-day"]}
-          readOnly
-        />
-
-        {endDate && (
-          <span className={classes["picked-date__end-day--span"]}>
-            end date
-          </span>
-        )}
-        <input
-          type="text"
-          value={formattedEndDate}
-          placeholder="End Date"
-          className={classes["picked-date__end-day"]}
-          readOnly
-        />
       </div>
     </div>
   );

@@ -10,11 +10,10 @@ const Layout: React.FC = () => {
   };
   return (
     <div>
-      <h1>Layout</h1>
       <div>
         <button onClick={handleLogout}>Sign Out</button>
-        <HomePage />
       </div>
+      <HomePage />
     </div>
   );
 };

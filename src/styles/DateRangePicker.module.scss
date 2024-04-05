@@ -7,50 +7,56 @@
   margin-bottom: 2rem;
   position: relative;
   font-weight: 600;
+  color: $black-color;
+  text-transform: uppercase;
 }
 
 @mixin inputStyle {
-  margin-top: 1rem;
   padding: 1rem 0.5rem;
   border: 2px solid $gray-light--2;
-  font-size: 16px;
+  font-size: 1rem;
 
   &::placeholder {
-    font-size: 16px;
+    font-size: 1rem;
   }
 
   @media screen and (max-width: 370px) {
-    width: 120px;
+    width: 7.5rem;
   }
 }
 
 @mixin inputSpanStyle {
   position: absolute;
-  top: 20px;
+  top: -0.5rem;
   color: $gray-light--1;
+  background-color: $white-color;
   text-transform: uppercase;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
+  padding: 0.125rem;
+  border: 2px solid $gray-light--2;
 }
 
 @mixin hoverSelected {
   background-color: $primary-color;
   transform: translateY(-2px);
-  box-shadow: 2px 4px 8px $gray-light--1;
+  box-shadow: 0.125rem 0.25rem 0.5rem $gray-light--1;
 }
 
 $border-radus: 0.5rem;
 
 .date-range {
+  width: 100%;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
+  background-color: $white-color;
 
   &__btn-months {
     height: 2rem;
     width: 2rem;
-    border: 2px solid $primary-color;
+    border: 0.125rem solid $primary-color;
     border-radius: 50%;
     cursor: pointer;
     position: absolute;
@@ -72,6 +78,7 @@ $border-radus: 0.5rem;
   &__days {
     display: flex;
     gap: 3rem;
+    margin-top: 1.5rem;
 
     @media screen and (max-width: 620px) {
       flex-direction: column;
@@ -82,27 +89,28 @@ $border-radus: 0.5rem;
   .days-grid {
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(7, 30px);
-    grid-template-rows: repeat(6, 30px);
+    grid-template-columns: repeat(7, 1.875rem);
+    grid-template-rows: repeat(6, 1.875rem);
     gap: 10px;
 
     &__day {
-      width: 30px;
-      height: 30px;
+      width: 1.875rem;
+      height: 1.875rem;
       border-radius: 50%;
       display: flex;
       justify-content: center;
       align-items: center;
       border: 1px solid $gray-light--1;
-      font-size: 14px;
+      font-size: 0.875rem;
       font-weight: 500;
-      box-shadow: 2px 2px 3px $gray-light--2;
+      box-shadow: 0.125rem 0.125rem 0.1875rem $gray-light--2;
       transition: transform 0.3s ease;
       cursor: pointer;
 
       &--previous-month {
         color: $gray-light--1;
         pointer-events: none;
+        // Left for design purposes to determine whether to see previous days or not
         // color: transparent;
         // border: none;
         // box-shadow: none;
@@ -111,6 +119,15 @@ $border-radus: 0.5rem;
       &:hover {
         @include hoverSelected();
       }
+
+      @media screen and (min-width: 900px) {
+        width: 2.25rem;
+        height: 2.25rem;
+      }
+    }
+    @media screen and (min-width: 900px) {
+      grid-template-columns: repeat(7, 2.25rem);
+      grid-template-rows: repeat(6, 2.25rem);
     }
   }
 }
@@ -118,21 +135,29 @@ $border-radus: 0.5rem;
 .days-of-week {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 1px;
+  gap: 0.0625rem;
   margin-bottom: 1rem;
 
   &__day {
     text-align: center;
-    width: 30px;
-    margin-right: 9px;
+    width: 1.875rem;
+    margin-right: 0.5625rem;
     color: $gray-light--1;
     font-weight: 600;
-    font-size: 13px;
+    font-size: 0.8125rem;
+
+    @media screen and (min-width: 900px) {
+      width: 2.25rem;
+    }
   }
 }
 
 .picked-date {
   position: relative;
+  display: flex;
+  align-items: center;
+  margin: 4rem auto 2rem auto;
+
   &__start-day {
     @include inputStyle();
     border-right: none;
@@ -158,8 +183,14 @@ $border-radus: 0.5rem;
   }
 }
 
+.left {
+  position: absolute;
+  left: 0;
+}
+
 .right {
-  right: 5px;
+  position: absolute;
+  right: 0.3125rem;
   left: auto !important;
 }
 
@@ -171,13 +202,19 @@ $border-radus: 0.5rem;
   @include hoverSelected();
 }
 
-.test {
-  padding: 1.5rem 0.5rem 0.5rem;
-}
-
 .disabled-day {
   pointer-events: none;
   &:not(.in-range) {
     opacity: 0.5;
+  }
+}
+
+.btn {
+  &-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-right: 1rem;
   }
 }

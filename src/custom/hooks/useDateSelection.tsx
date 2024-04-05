@@ -17,5 +17,17 @@ export function useDateSelection() {
     setSelectedDay(date);
   };
 
-  return { startDate, endDate, selectedDay, handleDayClick };
+  const cancelSelectedDated = () => {
+    setStartDate(null);
+    setEndDate(null);
+    setSelectedDay(null);
+  };
+
+  return {
+    startDate,
+    endDate,
+    selectedDay,
+    handleDayClick,
+    cancelSelectedDated,
+  };
 }

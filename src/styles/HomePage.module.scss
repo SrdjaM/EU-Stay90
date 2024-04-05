@@ -1,0 +1,58 @@
+@import "colors";
+
+.home-page {
+  &__container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+  }
+
+  &__trips {
+    width: 100%;
+  }
+
+  &__picker {
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+  }
+
+  &__picker.visible {
+    transform: translateX(0);
+  }
+}
+
+.btn_add {
+  width: 3.75rem !important;
+  height: 3.75rem !important;
+  box-shadow: 2px 2px 6px $gray-light--1;
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 999;
+
+  &--icon-style {
+    color: $primary-color;
+    font-size: 2rem;
+    font-weight: bold;
+  }
+}
+
+.btn_close {
+  position: fixed;
+  right: -1rem;
+  top: 1rem;
+  z-index: 1000;
+  transition: all 0.3s ease;
+
+  &.visible {
+    right: calc(100vw - 2rem);
+  }
+}
