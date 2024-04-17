@@ -4,12 +4,12 @@
 @import "mixins";
 
 @mixin btnStyle {
-  padding: $padding-sm-lg;
+  padding: $spacing-sm $spacing-lg;
   background: $white-color;
   border: $thin-border;
   border-radius: $border-radius-xs;
   color: $gray-dark--1;
-  font-weight: 600;
+  font-weight: $bold-fontweight;
   cursor: pointer;
   &:hover {
     background-color: $gray-light--3;
@@ -17,11 +17,9 @@
   }
 }
 
-.login-page {
-  &__container {
-    height: 23.75rem;
+.login-page__container{
     width: 18.75rem;
-    padding: $padding-xs;
+    padding: $spacing-sm;
     background: $white-color;
     display: flex;
     flex-direction: column;
@@ -37,24 +35,21 @@
     @include breakpoint-sm-and-lower {
       width: 15rem;
     }
-  }
 }
 
-.signup {
-  &__container {
-    margin-top: 1.5rem;
-    text-align: center;
-  }
+.signup__container{
+  margin: $spacing-ml 0 $spacing-xl 0;
+  text-align: center;
+}
 
-  &__text {
-    font-size: 0.75rem;
-  }
-  &__link {
-    margin-left: 0.5rem;
-    color: $dark-blue--1;
-    font-size: 0.875rem;
-    font-weight: 600;
-  }
+.signup__text{
+  font-size: $font-sm;
+}
+.signup__link{
+  margin-left: $spacing-sm;
+  color: $dark-blue--1;
+  font-size: 0.875rem;
+  font-weight: 600;
 }
 
 .btn-wrap {

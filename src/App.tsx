@@ -1,10 +1,8 @@
-import React from "react";
 import LoginPage from "./pages/LoginPage";
 import Layout from "./components/Layout";
 import classes from "./App.module.scss";
 import { useAuth } from "./contexts/AuthContext";
 import { Navigate, Route, Routes } from "react-router-dom";
-import AuthForm from "./components/AuthForm";
 
 function App() {
   const { isAuthenticated } = useAuth();

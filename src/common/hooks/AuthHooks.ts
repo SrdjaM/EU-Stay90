@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import {
   getAuth,
   signInWithEmailAndPassword,
@@ -16,20 +15,20 @@ interface AuthData {
 }
 
 export const useAuthentication = () => {
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { login } = useAuth();
 
-  const signIn = async (data: AuthData) => {
+  const signIn = async (data: AuthData, onSuccess: () => void) => {
     try {
       const auth = getAuth(app);
       await signInWithEmailAndPassword(auth, data.email, data.password);
       login();
+      onSuccess();
     } catch (error: any) {
       throw new Error(error.code);
     }
   };
 
-  const signUp = async (data: AuthData) => {
+  const signUp = async (data: AuthData, onSuccess: () => void) => {
     try {
       const auth = getAuth(app);
       await createUserWithEmailAndPassword(auth, data.email, data.password);
@@ -37,7 +36,8 @@ export const useAuthentication = () => {
         username: data.username,
         email: data.email,
         password: data.password,
-      });
+      }); 
+      onSuccess();
     } catch (error: any) {
       throw Error(error.code);
     }

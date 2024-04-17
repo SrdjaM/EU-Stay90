@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { object, string } from "yup";
-import classes from "../styles/AuthForm.module.scss";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+
 import { FieldNames } from "../common/enums/FieldNames";
-import { ERROR_MESSAGES } from "../common/constants/constants";
 import { useAuthentication } from "../common/hooks/AuthHooks";
 import { useLocation, useNavigate } from "react-router-dom";
+import { ERROR_MESSAGES, ROUTES, UI_TEXT } from "../common/constants/constants";
 import Button from "./Button";
+import classes from "../styles/AuthForm.module.scss";
 
 const PASSWORD_MIN_CHAR = 6;
 
@@ -26,22 +29,20 @@ const AuthForm: React.FC = () => {
     email: "",
     password: "",
   });
-
   const [errors, setErrors] = useState<FormError[]>([]);
-
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
   const [isSuccess, setIsSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { signIn, signUp } = useAuthentication();
 
   const location = useLocation();
+  const navigate = useNavigate();
 
-  let navigate = useNavigate();
+  const isSignIn = location.pathname === ROUTES.SIGN_IN;
 
-  const isSignIn = location.pathname === "/signin";
-
-  useEffect(() => {
+  const resetFormData = () => {
     setAuthData({
       email: "",
       password: "",
@@ -50,15 +51,7 @@ const AuthForm: React.FC = () => {
     });
     setErrors([]);
     setErrorMessage(null);
-  }, [isSignIn]);
-
-  useEffect(() => {
-    if (isSuccess) {
-      setTimeout(() => {
-        setIsSuccess(false);
-      }, 5000);
-    }
-  }, [isSuccess]);
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -110,14 +103,19 @@ const AuthForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const onSuccess = () => {
+      resetFormData();
+      navigate("/");
+    };
+
     try {
       if (isSignIn) {
-        await signIn(authData);
-        navigate("/");
+        await signIn(authData, onSuccess);
+        navigate(ROUTES.HOME);
       } else {
-        await signUp(authData);
+        await signUp(authData, onSuccess);
         setIsSuccess(true);
-        navigate("/signin");
+        navigate(ROUTES.SIGN_IN);
       }
     } catch (error: any) {
       if (error.message === "auth/invalid-credential") {
@@ -160,6 +158,18 @@ const AuthForm: React.FC = () => {
     return null;
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
+
+  useEffect(() => {
+    resetFormData();
+  }, [location.pathname]); 
+
   return (
     <form onSubmit={handleSubmit} className={classes.form}>
       {isSuccess && (
@@ -169,8 +179,8 @@ const AuthForm: React.FC = () => {
         <div>
           <input
             type="text"
-            id="username"
-            name="username"
+            id={FieldNames.Username}
+            name={FieldNames.Username}
             placeholder="Username"
             value={authData.username || ""}
             onChange={handleInputChange}
@@ -183,8 +193,8 @@ const AuthForm: React.FC = () => {
       <div>
         <input
           type="email"
-          id="email"
-          name="email"
+          id={FieldNames.Email}
+          name={FieldNames.Email}
           placeholder="Email"
           value={authData.email}
           onChange={handleInputChange}
@@ -193,39 +203,53 @@ const AuthForm: React.FC = () => {
         />
         {renderFieldErrorMessage("email")}
       </div>
-      <div>
+      <div className={classes["input-password"]}>
         <input
-          type="password"
-          id="password"
-          name="password"
+          type={showPassword ? "text" : "password"}
+          id={FieldNames.Password}
+          name={FieldNames.Password}
           placeholder="Password"
           value={authData.password}
           onChange={handleInputChange}
           onBlur={handleBlur}
           className={classes["form-input"]}
         />
-        {renderFieldErrorMessage("password")}
+        <div className={classes["toggle-password"]}>
+          <FontAwesomeIcon
+            icon={showPassword ? faEyeSlash : faEye}
+            onClick={togglePasswordVisibility}
+          />
+        </div>
       </div>
+      {renderFieldErrorMessage("password")}
       <div>
         {!isSignIn && (
-          <div>
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              placeholder="Confirm Password"
-              value={authData.confirmPassword || ""}
-              onChange={handleInputChange}
-              onBlur={handleBlur}
-              className={classes["form-input"]}
-            />
+          <>
+            <div className={classes["input-password"]}>
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                id={FieldNames.ConfirmPassword}
+                name={FieldNames.ConfirmPassword}
+                placeholder="Confirm Password"
+                value={authData.confirmPassword || ""}
+                onChange={handleInputChange}
+                onBlur={handleBlur}
+                className={classes["form-input"]}
+              />
+              <div className={classes["toggle-password"]}>
+                <FontAwesomeIcon
+                  icon={showConfirmPassword ? faEyeSlash : faEye}
+                  onClick={toggleConfirmPasswordVisibility}
+                />
+              </div>
+            </div>
             {renderFieldErrorMessage("confirmPassword")}
-          </div>
+          </>
         )}
       </div>
       <div className={classes["btn-container"]}>
         <Button type="submit" variant="secondary" disabled={!isFormValid()}>
-          {isSignIn ? "Sign In" : "Sign Up"}
+          {isSignIn ? UI_TEXT.SIGN_IN : UI_TEXT.SIGN_UP}
         </Button>
       </div>
       {errorMessage && (

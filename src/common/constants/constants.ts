@@ -14,3 +14,14 @@ export const ERROR_MESSAGES = {
   TO_MANY_REQUESTS: "Too many requests, try again later!",
   EMAIL_IN_USE: "Email already  in use!",
 };
+
+export const ROUTES = {
+  HOME: "/",
+  SIGN_IN: "/signin",
+  SIGN_UP: "/signup"
+}
+
+export const UI_TEXT = {
+  SIGN_IN: "Sign In",
+  SIGN_UP: "Sign Up"
+}

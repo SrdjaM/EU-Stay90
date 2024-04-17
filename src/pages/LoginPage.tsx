@@ -1,20 +1,21 @@
 import React from "react";
-import classes from "../styles/LoginPage.module.scss";
 import AuthForm from "../components/AuthForm";
-import { useNavigate, useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import {ROUTES, UI_TEXT} from "../common/constants/constants"
 import Button from "../components/Button";
+import classes from "../styles/LoginPage.module.scss";
 
 const LoginPage: React.FC = () => {
   let navigate = useNavigate();
 
   const handleSignIn = () => {
-    navigate("/signin");
+    navigate(ROUTES.SIGN_IN);
   };
 
   const location = useLocation();
 
-  const isSignIn = location.pathname === "/signin";
+  const isSignIn = location.pathname === ROUTES.SIGN_IN;
 
   return (
     <div className={classes["login-page__container"]}>
@@ -33,7 +34,7 @@ const LoginPage: React.FC = () => {
         <div className={classes["signup__container"]}>
           <span className={classes["signup__text"]}>Create an account</span>
           <Link to={"/signup"} className={classes["signup__link"]}>
-            Sign up
+            {UI_TEXT.SIGN_UP}
           </Link>
         </div>
       )}
