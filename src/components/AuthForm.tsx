@@ -1,37 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import { object, string } from "yup";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
 import { FieldNames } from "../common/enums/FieldNames";
+import { ActionTypes } from "../common/enums/ActionTypes";
 import { useAuthentication } from "../common/hooks/AuthHooks";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ERROR_MESSAGES, ROUTES, UI_TEXT } from "../common/constants/constants";
+import { reducer, initialState } from "../common/hooks/authReducer";
+import { AuthData } from "../utils/types";
 import Button from "./Button";
 import classes from "../styles/AuthForm.module.scss";
 
 const PASSWORD_MIN_CHAR = 6;
 
-interface AuthData {
-  username?: string;
-  email: string;
-  password: string;
-  confirmPassword?: string;
-}
-
-type FormError = {
-  fieldName: keyof AuthData;
-  message: string;
-};
-
 const AuthForm: React.FC = () => {
-  const [authData, setAuthData] = useState<AuthData>({
-    email: "",
-    password: "",
-  });
-  const [errors, setErrors] = useState<FormError[]>([]);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isSuccess, setIsSuccess] = useState(false);
+  const [state, dispatch] = useReducer(reducer, initialState);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -42,20 +27,23 @@ const AuthForm: React.FC = () => {
 
   const isSignIn = location.pathname === ROUTES.SIGN_IN;
 
+  useEffect(() => {
+    resetFormData();
+  }, [location.pathname]);
+
   const resetFormData = () => {
-    setAuthData({
-      email: "",
-      password: "",
-      username: "",
-      confirmPassword: "",
-    });
-    setErrors([]);
-    setErrorMessage(null);
+    dispatch({ type: ActionTypes.SET_AUTH_DATA, payload: { email: "", password: "" } });
+    dispatch({ type: ActionTypes.SET_ERRORS, payload: [] });
+    dispatch({ type: ActionTypes.SET_ERROR_MESSAGE, payload: null });
+    dispatch({ type: ActionTypes.SET_IS_SUCCESS, payload: false });
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setAuthData({ ...authData, [name]: value });
+    dispatch({
+      type: ActionTypes.SET_AUTH_DATA,
+      payload: { ...state.authData, [name]: value },
+    });
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -85,18 +73,24 @@ const AuthForm: React.FC = () => {
         confirmPassword:
           !isSignIn && name === FieldNames.ConfirmPassword
             ? string()
-                .oneOf([authData.password], ERROR_MESSAGES.PASSWORDS_MUST_MATCH)
+                .oneOf([state.authData.password], ERROR_MESSAGES.PASSWORDS_MUST_MATCH)
                 .required(ERROR_MESSAGES.CONFIRM_PASSWORD_REQUIRED)
             : string(),
       });
 
       fieldSchema.validateSyncAt(name, { [name]: value });
-      setErrors((errors) => errors.filter((error) => error.fieldName !== name));
+      dispatch({ 
+        type: ActionTypes.SET_ERRORS, 
+        payload: state.errors.filter((error) => error.fieldName !== name)
+      });
     } catch (error: any) {
-      setErrors((errors) => [
-        ...errors.filter((err) => err.fieldName !== name),
-        { fieldName: name as keyof AuthData, message: error.message },
-      ]);
+      dispatch({ 
+        type: ActionTypes.SET_ERRORS, 
+        payload: [
+          ...state.errors.filter((error) => error.fieldName !== name),
+          { fieldName: name as keyof AuthData, message: error.message },
+        ],
+      });
     }
   };
 
@@ -110,34 +104,34 @@ const AuthForm: React.FC = () => {
 
     try {
       if (isSignIn) {
-        await signIn(authData, onSuccess);
+        await signIn(state.authData, onSuccess);
         navigate(ROUTES.HOME);
       } else {
-        await signUp(authData, onSuccess);
-        setIsSuccess(true);
+        await signUp(state.authData, onSuccess);
+        dispatch({type: ActionTypes.SET_IS_SUCCESS,payload: true});
         navigate(ROUTES.SIGN_IN);
       }
     } catch (error: any) {
       if (error.message === "auth/invalid-credential") {
-        setErrorMessage(ERROR_MESSAGES.INVALID_EMAIL_OR_PASSWORD);
+        dispatch({ type: ActionTypes.SET_ERROR_MESSAGE , payload: ERROR_MESSAGES.INVALID_EMAIL_OR_PASSWORD });
       } else if (error.message === "auth/too-many-requests") {
-        setErrorMessage(ERROR_MESSAGES.TO_MANY_REQUESTS);
+        dispatch({ type: ActionTypes.SET_ERROR_MESSAGE , payload: ERROR_MESSAGES.TO_MANY_REQUESTS });
       } else if (error.message === "auth/email-already-in-use") {
-        setErrorMessage(ERROR_MESSAGES.EMAIL_IN_USE);
+        dispatch({ type: ActionTypes.SET_ERROR_MESSAGE , payload: ERROR_MESSAGES.EMAIL_IN_USE});
       }
     }
   };
 
   const isFormValid = () => {
     if (isSignIn) {
-      return authData.email && authData.password && errors.length === 0;
+      return state.authData.email && state.authData.password && state.errors.length === 0;
     } else {
       return (
-        authData.email &&
-        authData.password &&
-        authData.username &&
-        authData.confirmPassword &&
-        errors.length === 0
+        state.authData.email &&
+        state.authData.password &&
+        state.authData.username &&
+        state.authData.confirmPassword &&
+        state.errors.length === 0
       );
     }
   };
@@ -151,7 +145,7 @@ const AuthForm: React.FC = () => {
   };
 
   const renderFieldErrorMessage = (fieldName: string) => {
-    const error = errors.find((error) => error.fieldName === fieldName);
+    const error = state.errors.find((error) => error.fieldName === fieldName);
     if (error) {
       return renderErrorMessage(fieldName, error.message);
     }
@@ -172,7 +166,7 @@ const AuthForm: React.FC = () => {
 
   return (
     <form onSubmit={handleSubmit} className={classes.form}>
-      {isSuccess && (
+      {state.isSuccess && (
         <div className={classes["success-message"]}>Successful sign up!</div>
       )}
       {!isSignIn && (
@@ -182,7 +176,7 @@ const AuthForm: React.FC = () => {
             id={FieldNames.Username}
             name={FieldNames.Username}
             placeholder="Username"
-            value={authData.username || ""}
+            value={state.authData.username || ""}
             onChange={handleInputChange}
             onBlur={handleBlur}
             className={classes["form-input"]}
@@ -196,7 +190,7 @@ const AuthForm: React.FC = () => {
           id={FieldNames.Email}
           name={FieldNames.Email}
           placeholder="Email"
-          value={authData.email}
+          value={state.authData.email}
           onChange={handleInputChange}
           onBlur={handleBlur}
           className={classes["form-input"]}
@@ -209,7 +203,7 @@ const AuthForm: React.FC = () => {
           id={FieldNames.Password}
           name={FieldNames.Password}
           placeholder="Password"
-          value={authData.password}
+          value={state.authData.password}
           onChange={handleInputChange}
           onBlur={handleBlur}
           className={classes["form-input"]}
@@ -231,7 +225,7 @@ const AuthForm: React.FC = () => {
                 id={FieldNames.ConfirmPassword}
                 name={FieldNames.ConfirmPassword}
                 placeholder="Confirm Password"
-                value={authData.confirmPassword || ""}
+                value={state.authData.confirmPassword || ""}
                 onChange={handleInputChange}
                 onBlur={handleBlur}
                 className={classes["form-input"]}
@@ -252,8 +246,8 @@ const AuthForm: React.FC = () => {
           {isSignIn ? UI_TEXT.SIGN_IN : UI_TEXT.SIGN_UP}
         </Button>
       </div>
-      {errorMessage && (
-        <div className={classes["form-input__error"]}>{errorMessage}</div>
+      {state.errorMessage && (
+        <div className={classes["form-input__error"]}>{state.errorMessage}</div>
       )}
     </form>
   );
