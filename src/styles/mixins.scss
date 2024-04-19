@@ -1,0 +1,16 @@
+@import "colors";
+@import "_variables";
+
+@mixin body {
+  font-size: $font-m;
+}
+
+@mixin typography-sm {
+  font-size: $font-sm;
+  font-weight: $bold-fontweight;
+}
+
+@mixin typography-sm-2 {
+  font-size: 0.875rem;
+  font-weight: $bold-fontweight;
+}

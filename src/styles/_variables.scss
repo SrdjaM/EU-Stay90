@@ -1,0 +1,28 @@
+@import "colors";
+
+$focus-outline: 0.125rem solid $focus-color;
+$spacing-sm:0.5rem;
+$spacing-m: 1rem;
+$spacing-ml:1.5rem;
+$spacing-lg: 2rem;
+$spacing-xl: 3rem;
+$bold-fontweight: 600;
+$font-sm: 0.75rem;
+$font-m: 1rem;
+
+$box-shadow-lg: 2px 4px 4px $gray-light--1;
+$box-shadow-xl: 2px 4px 6px $gray-light--1;
+
+// Breakpoints
+$breakpoint-sm: 330px;
+$breakpoint-md: 600px;
+$breakpoint-lg: 900px;
+$breakpoint-xl: 1200px;
+$breakpoint-xxl: 1440px;
+
+//Borders
+$thin-border: 1px solid $black-color;
+$thin-border--blue: 1px solid $light-blue--2;
+$thick-border--dark: 2px solid #000;
+$border-radius-xs: 0.25rem;
+$border-dark: 1px solid $gray-dark--1;
