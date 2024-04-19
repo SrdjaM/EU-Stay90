@@ -1,0 +1,6 @@
+export enum ActionTypes {
+    SET_AUTH_DATA = "SET_AUTH_DATA",
+    SET_ERRORS = "SET_ERRORS",
+    SET_ERROR_MESSAGE = "SET_ERROR_MESSAGE",
+    SET_IS_SUCCESS = "SET_IS_SUCCESS",
+  }

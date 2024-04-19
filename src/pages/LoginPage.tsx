@@ -1,43 +1,43 @@
-import React, { useState } from "react";
-import SignIn from "../components/SignIn";
-import SignUp from "../components/SignUp";
+import React from "react";
+import AuthForm from "../components/AuthForm";
+import { Link } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import {ROUTES, UI_TEXT} from "../common/constants/constants"
+import Button from "../components/Button";
 import classes from "../styles/LoginPage.module.scss";
 
 const LoginPage: React.FC = () => {
-  const [isSignIn, setIsSignIn] = useState(true);
+  let navigate = useNavigate();
 
   const handleSignIn = () => {
-    setIsSignIn(true);
+    navigate(ROUTES.SIGN_IN);
   };
 
-  const handleSignUp = () => {
-    setIsSignIn(false);
-  };
+  const location = useLocation();
+
+  const isSignIn = location.pathname === ROUTES.SIGN_IN;
 
   return (
     <div className={classes["login-page__container"]}>
       <h2>{isSignIn ? "Login Form" : "Sign Up Form"}</h2>
-      <div className={classes["btn-wrap"]}>
-        <div className={classes["button-container"]}>
-          <button
-            onClick={handleSignIn}
-            className={`${classes["login-page__btn"]} ${
-              isSignIn ? classes["inactive"] : ""
-            }`}
-          >
+      {!isSignIn ? (
+        <div className={classes["btn-wrap"]}>
+          <Button variant="primary" onClick={handleSignIn}>
             Login
-          </button>
-          <button
-            onClick={handleSignUp}
-            className={`${classes["login-page__btn"]} ${
-              !isSignIn ? classes["inactive"] : ""
-            }`}
-          >
-            Sign Up
-          </button>
+          </Button>
         </div>
-      </div>
-      {isSignIn ? <SignIn /> : <SignUp />}
+      ) : (
+        <div className={classes["welcome-back--message"]}>Welcome back!</div>
+      )}
+      <AuthForm />
+      {isSignIn && (
+        <div className={classes["signup__container"]}>
+          <span className={classes["signup__text"]}>Create an account</span>
+          <Link to={"/signup"} className={classes["signup__link"]}>
+            {UI_TEXT.SIGN_UP}
+          </Link>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,81 +1,64 @@
 @import "colors";
+@import "_variables";
+@import "breakpoints";
+@import "mixins";
 
 @mixin btnStyle {
-  padding: 0.5rem 2rem;
+  padding: $spacing-sm $spacing-lg;
   background: $white-color;
-  border: 1px solid $black-color;
-  border-radius: 0.25rem;
+  border: $thin-border;
+  border-radius: $border-radius-xs;
   color: $gray-dark--1;
-  font-weight: 600;
+  font-weight: $bold-fontweight;
   cursor: pointer;
   &:hover {
     background-color: $gray-light--3;
-    box-shadow: 2px 4px 4px $gray-light--1;
+    box-shadow: $box-shadow-lg;
   }
 }
 
-.login-page {
-  &__container {
-    height: 21.875rem;
+.login-page__container{
     width: 18.75rem;
-    padding: 0.5rem;
+    padding: $spacing-sm;
     background: $white-color;
     display: flex;
     flex-direction: column;
     align-items: center;
-    border: 2px solid #000;
-    border-radius: 0.25rem;
+    border: $thick-border--dark;
+    border-radius: $border-radius-xs;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-  }
+    box-shadow: $box-shadow-xl;
 
-  &__btn {
-    padding: 0.3rem 2rem;
-    background: $gray-light--2;
-    border: 1px solid $black-color;
-    border-radius: 0.25rem;
-    color: $gray-dark--1;
-    font-weight: 600;
-    cursor: pointer;
-    &:hover {
-      background-color: $gray-dark--1;
-      color: $white-color;
-      box-shadow: 2px 4px 4px $gray-light--1;
+    @include breakpoint-sm-and-lower {
+      width: 15rem;
     }
-    &.inactive {
-      background: $white-color;
-      color: $gray-dark--1;
-      border: 1px solid $gray-dark--1;
-      cursor: default;
-      border: none;
-      box-shadow: none;
-    }
-  }
 }
 
-.button-container {
-  position: absolute;
-  top: 0;
-  left: 25px;
-  width: 80%;
-  transition: left 0.5s ease;
-  border: 1px solid $gray-dark--1;
-  border-radius: 4px;
-  padding: 4px;
-  margin-bottom: 0.5rem;
+.signup__container{
+  margin: $spacing-ml 0 $spacing-xl 0;
+  text-align: center;
 }
 
-.button-container button {
-  width: 50%;
-  float: left;
+.signup__text{
+  font-size: $font-sm;
+}
+.signup__link{
+  @include typography-sm-2;
+  margin-left: $spacing-sm;
+  color: $dark-blue--1;
 }
 
 .btn-wrap {
   position: relative;
   width: 100%;
-  height: 45px;
-  display: flex;
-  align-items: center;
+  height: 2.8125rem;
+  text-align: center;
+}
+
+.welcome-back--message {
+  color: $light-blue--2;
+  margin-bottom: $spacing-sm;
 }

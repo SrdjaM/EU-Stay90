@@ -1,0 +1,52 @@
+@import "_variables";
+@import "breakpoints";
+
+.button {
+  padding: $spacing-sm $spacing-lg;
+  border: $thin-border--blue;
+  border-radius: $border-radius-xs;
+  font-weight: $bold-fontweight;
+  cursor: pointer;
+  margin-bottom: $spacing-sm;
+  white-space: nowrap;
+
+  &:focus {
+    outline: $focus-outline;
+  }
+
+  @include breakpoint-sm-and-lower {
+    padding: $spacing-sm $spacing-m;
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}
+
+.primary {
+  background: $very-light-blue--1;
+  color: $light-blue--2;
+
+  &:hover,
+  &:focus {
+    background-color: $dark-blue--1;
+    color: $very-light-blue--1;
+    box-shadow: $box-shadow-lg;
+  }
+}
+
+.secondary {
+  background: $dark-blue--1;
+  color: $very-light-blue--1;
+
+  &:hover,
+  &:focus {
+    background-color: $very-light-blue--1;
+    color: $light-blue--2;
+    border: 1px solid $dark-blue--1;
+    box-shadow: $box-shadow-lg;
+  }
+}
+
