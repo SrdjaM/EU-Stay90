@@ -46,10 +46,9 @@
   font-size: $font-sm;
 }
 .signup__link{
+  @include typography-sm-2;
   margin-left: $spacing-sm;
   color: $dark-blue--1;
-  font-size: 0.875rem;
-  font-weight: 600;
 }
 
 .btn-wrap {
@@ -60,5 +59,6 @@
 }
 
 .welcome-back--message {
-  @include successTypography();
+  color: $light-blue--2;
+  margin-bottom: $spacing-sm;
 }

@@ -1,23 +1,16 @@
 @import "colors";
 @import "_variables";
 
-@mixin typography {
-  font-size: $font-sm;
-  font-weight: $bold-fontweight;
-  color: $gray-light--1;
-  text-transform: capitalize;
-}
-
-@mixin errorTypography {
-  font-size: $font-sm;
-  font-weight: $bold-fontweight;
-  color: $error-color;
-  margin-bottom: $spacing-sm;
-}
-
-@mixin successTypography {
+@mixin body {
   font-size: $font-m;
+}
+
+@mixin typography-sm {
+  font-size: $font-sm;
   font-weight: $bold-fontweight;
-  color: $light-blue--2;
-  margin-bottom: $spacing-sm;
+}
+
+@mixin typography-sm-2 {
+  font-size: 0.875rem;
+  font-weight: $bold-fontweight;
 }

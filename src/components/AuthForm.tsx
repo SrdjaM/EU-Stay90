@@ -35,7 +35,6 @@ const AuthForm: React.FC = () => {
     dispatch({ type: ActionTypes.SET_AUTH_DATA, payload: { email: "", password: "" } });
     dispatch({ type: ActionTypes.SET_ERRORS, payload: [] });
     dispatch({ type: ActionTypes.SET_ERROR_MESSAGE, payload: null });
-    dispatch({ type: ActionTypes.SET_IS_SUCCESS, payload: false });
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -108,7 +107,7 @@ const AuthForm: React.FC = () => {
         navigate(ROUTES.HOME);
       } else {
         await signUp(state.authData, onSuccess);
-        dispatch({type: ActionTypes.SET_IS_SUCCESS,payload: true});
+        dispatch({type: ActionTypes.SET_IS_SUCCESS, payload: true});
         navigate(ROUTES.SIGN_IN);
       }
     } catch (error: any) {
@@ -121,6 +120,8 @@ const AuthForm: React.FC = () => {
       }
     }
   };
+
+  console.log(state.isSuccess);
 
   const isFormValid = () => {
     if (isSignIn) {

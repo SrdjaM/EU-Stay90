@@ -23,12 +23,16 @@
   border-radius: $border-radius-xs;
 
   &::placeholder {
-    @include typography;
+    @include typography-sm;
+    color: $gray-light--1;
+    text-transform: capitalize;
   }
 }
 
 .form-input__error{
-  @include errorTypography;
+  @include typography-sm;
+  color: $error-color;
+  margin-bottom: $spacing-sm;
 }
 
 .form-input:focus{
@@ -40,7 +44,8 @@
 }
 
 .success-message {
-  @include successTypography;
+  color: $light-blue--2;
+  margin-bottom: $spacing-sm;
 }
 
 .input-password {
