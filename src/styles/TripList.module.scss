@@ -1,18 +1,17 @@
 @import "colors";
-@mixin boxStyle {
-  border: 2px solid $gray-light--2;
-  box-shadow: 0.125rem 0.125rem 0.1875rem $gray-light--2;
-  padding: 0.5rem;
-  font-weight: 600;
-  color: $black-color;
-  text-align: center;
-  text-transform: uppercase;
+@import "_variables";
+@import "mixins";
+@import "breakpoints";
 
-  @media screen and (max-width: 500px) {
-    font-size: 1rem;
-  }
-  @media screen and (max-width: 420px) {
-    font-size: 0.75rem;
+@mixin boxStyle {
+  border: $thick-border--light;
+  box-shadow: $box-shadow-light;
+  padding: $spacing-sm;
+  color: $black-color;
+  @include typography-center;
+
+  @include breakpoint-sm-to-md-and-lower{
+    font-size: $font-sm;
   }
 }
 
@@ -21,131 +20,136 @@
   flex-direction: column;
 }
 
-.trip-list {
-  &__container {
-    max-height: 18.75rem;
-    padding: 0 1rem;
-    width: 100%;
-    text-align: center;
-    overflow-y: scroll;
-    position: relative;
+.trip-list__container{
+  max-height: 18.75rem;
+  padding: 0 $spacing-m;
+  width: 100%;
+  text-align: center;
+  overflow-y: scroll;
+  position: relative;
 
-    &::-webkit-scrollbar {
-      width: 0.5rem;
+  &::-webkit-scrollbar {
+    width: 0.5rem;
 
-      @media screen and (max-width: 600px) {
-        width: 0.25rem;
-      }
-    }
-    &::-webkit-scrollbar-track {
-      background: $gray-light--1;
-      border-radius: 0.5rem;
-    }
-    &::-webkit-scrollbar-thumb {
-      background: $primary-color;
-      border-radius: 0.5rem;
-      height: 4rem;
-    }
-
-    &::-webkit-scrollbar-thumb:hover {
-      background: $black-color;
-      border-radius: 0.5rem;
+    @include breakpoint-md-and-lower{
+      width: 0.25rem;
     }
   }
-
-  &__list {
-    padding: 0;
+  &::-webkit-scrollbar-track {
+    background: $gray-light--1;
+    border-radius: $border-radius-s;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: $primary-color;
+    border-radius: $border-radius-s;
+    height: 4rem;
   }
 
-  &__header {
-    color: $black-color;
-    padding: 0.25rem;
-    text-transform: uppercase;
-  }
-
-  &__count {
-    align-items: center;
-    @include displayFlex();
-  }
-
-  &__total-trips {
-    align-self: self-start;
-    padding: 1rem 1rem 1rem 0;
-
-    .trips-spent {
-      @include boxStyle();
-      @include displayFlex();
-      border-top-right-radius: 1rem;
-
-      &--total-days {
-        font-size: 2rem;
-        color: $primary-color;
-      }
-    }
-
-    .trips-refill {
-      @include boxStyle();
-      @include displayFlex();
-      border-bottom-right-radius: 1rem;
-
-      &--date {
-        font-size: 1.2rem;
-        color: $primary-color;
-      }
-    }
-
-    .trips-left {
-      @include displayFlex();
-      @include boxStyle();
-      border-top: none;
-      &--exceeded {
-        font-size: 1rem;
-        color: $error-color;
-      }
-    }
-  }
-
-  &--empty {
-    font-size: 1.5rem;
-    color: $error-color;
+  &::-webkit-scrollbar-thumb:hover {
+    background: $black-color;
+    border-radius: $border-radius-s;
   }
 }
 
-.trip {
-  &__list {
-    list-style: none;
-  }
-  &__container {
-    @include boxStyle();
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.5rem;
-    margin-bottom: 0.25rem;
-    color: $black-color;
-    font-weight: 600;
+.trip-list__list{
+  padding: 0;
+}
 
-    @media screen and (max-width: 600px) {
-      font-size: 0.75rem;
-    }
+.trip-list__header{
+  color: $black-color;
+  padding: $spacing-xs;
+  text-transform: uppercase;
+}
 
-    @media screen and (max-width: 420px) {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.25rem;
-    }
-  }
-  &__total-days {
-    background-color: $black-color;
-    border: 1px solid $black-color;
-    border-radius: 1rem;
-    padding: 0.5rem;
-    color: $white-color;
-    font-size: 0.8125rem;
-    @media screen and (max-width: 420px) {
-      grid-column-start: 2;
-      grid-column-end: 3;
-      grid-row: auto / span 2;
-    }
+.trip-list__count{
+  align-items: center;
+  @include displayFlex();
+}
+
+.trip-list__total-trips {
+  align-self: self-start;
+  padding: $spacing-m $spacing-m $spacing-m 0;
+}
+
+.trip-list__total-trips .trips-spent {
+  @include boxStyle();
+  @include displayFlex();
+  border-top-right-radius: $spacing-m;
+
+  &--total-days {
+    font-size: $font-xl;
+    color: $primary-color;
   }
 }
+
+.trip-list__total-trips .trips-spent--total-days {
+  font-size: $font-xl;
+  color: $primary-color;
+}
+
+.trip-list__total-trips .trips-refill {
+  @include boxStyle();
+  @include displayFlex();
+  border-bottom-right-radius: $spacing-m;
+}
+
+.trip-list__total-trips .trips-refill--date {
+  font-size: $font-m;
+  color: $primary-color;
+}
+
+.trip-list__total-trips .trips-left {
+  @include displayFlex();
+  @include boxStyle();
+  border-top: none;
+}
+
+.trip-list__total-trips .trips-left--exceeded {
+  font-size: $font-m;
+  color: $error-color;
+}
+
+.trip-list--empty {
+  font-size: $font-lg;
+  color: $error-color;
+}
+
+.trip__list {
+  list-style: none;
+}
+
+.trip__container {
+  @include boxStyle();
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-sm;
+  margin-bottom: $spacing-xs;
+  color: $black-color;
+  font-weight: $bold-fontweight;
+
+  @include breakpoint-md-and-lower {
+    font-size: $font-sm;
+  }
+
+  @include breakpoint-sm-to-md-and-lower {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.25rem;
+  }
+}
+
+.trip__total-days {
+  background-color: $black-color;
+  border: $thin-border;
+  border-radius: 1rem;
+  padding: $spacing-sm;
+  color: $white-color;
+  font-size: $font-sm;
+  @include breakpoint-sm-to-md-and-lower {
+    grid-column-start: 2;
+    grid-column-end: 3;
+    grid-row: auto / span 2;
+  }
+}
+

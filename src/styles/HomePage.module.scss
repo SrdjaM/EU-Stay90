@@ -1,11 +1,12 @@
-@import "colors";
+@import "colors.scss";
+@import "_variables";
+@import "mixins";
+@import "breakpoints";
 
 .home-page {
   &__container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 2rem;
+    padding: $spacing-lg;
+    @include flex-center();
   }
 
   &__trips {
@@ -32,7 +33,7 @@
 .btn_add {
   width: 3.75rem !important;
   height: 3.75rem !important;
-  box-shadow: 2px 2px 6px $gray-light--1;
+  box-shadow: $box-shadow-xl;
   position: fixed;
   bottom: 1.5rem;
   right: 1.5rem;
@@ -40,8 +41,8 @@
 
   &--icon-style {
     color: $primary-color;
-    font-size: 2rem;
-    font-weight: bold;
+    font-size: $font-xl;
+    font-weight: $bold-fontweight;
   }
 }
 
