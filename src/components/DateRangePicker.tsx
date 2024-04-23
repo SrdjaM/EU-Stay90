@@ -2,15 +2,16 @@ import React from "react";
 import classes from "../styles/DateRangePicker.module.scss";
 import { useMonthYear } from "../custom/hooks/useMonthYear";
 import { useDateSelection } from "../custom/hooks/useDateSelection";
+import RoundButton from "../custom/components/RoundButton";
+import { formatDate } from "../custom/utils/dateUtils";
+import { months, daysOfWeek } from "../common/constants/constants";
+
 import {
   faAngleLeft,
   faAngleRight,
   faX,
   faCheck,
 } from "@fortawesome/free-solid-svg-icons";
-import RoundButton from "../custom/components/RoundButton";
-import { formatDate } from "../custom/utils/dateUtils";
-
 import { db } from "../firebase";
 import { addDoc, collection } from "firebase/firestore";
 import { useUser } from "../contexts/UserContext";
@@ -34,23 +35,6 @@ interface Day {
 }
 
 const DateRangePicker: React.FC = () => {
-  const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-
-  const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-
   const { currentMonth, currentYear, changeMonth, getNextMonthAndYear } =
     useMonthYear();
   const {
@@ -58,7 +42,7 @@ const DateRangePicker: React.FC = () => {
     endDate,
     selectedDay,
     handleDayClick,
-    cancelSelectedDated,
+    cancelSelectedDates,
   } = useDateSelection();
 
   const { userId } = useUser();
@@ -172,7 +156,7 @@ const DateRangePicker: React.FC = () => {
 
         await addDoc(collection(db, "trips"), newTrip);
 
-        cancelSelectedDated();
+        cancelSelectedDates();
       }
     } catch (error) {
       console.error("Error adding trip:", error);
@@ -216,7 +200,7 @@ const DateRangePicker: React.FC = () => {
         </div>
         <div className={classes["btn-container"]}>
           <RoundButton
-            onButtonClick={cancelSelectedDated}
+            onButtonClick={cancelSelectedDates}
             icon={faX}
             ariaLabel="Cancel dates"
           />

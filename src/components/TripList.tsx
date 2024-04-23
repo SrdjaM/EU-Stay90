@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { formatDate } from "../custom/utils/dateUtils";
-import classes from "../styles/TripList.module.scss";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../firebase";
 import { useUser } from "../contexts/UserContext";
+
+import { formatDate } from "../custom/utils/dateUtils";
+import classes from "../styles/TripList.module.scss";
+import { months } from "../common/constants/constants";
 
 const DAYS_AVAILABLE_IN_EU = 90;
 
@@ -11,21 +13,6 @@ export interface Trip {
   startDate: Date;
   endDate: Date;
 }
-
-const months = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
 
 const TripList: React.FC = () => {
   const [trips, setTrips] = useState<Trip[]>([

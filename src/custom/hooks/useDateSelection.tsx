@@ -1,33 +1,45 @@
 import React, { useState } from "react";
 
 export function useDateSelection() {
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
-  const [selectedDay, setSelectedDay] = useState<Date | null>(null);
+  const [selection, setSelection] = useState<{
+    startDate: Date | null;
+    endDate: Date | null;
+    selectedDay: Date | null;
+  }>({
+    startDate: null,
+    endDate: null,
+    selectedDay: null,
+  });
 
   const handleDayClick = (date: Date | null) => {
-    if (!startDate && !endDate) {
-      setStartDate(date);
-    } else if (startDate && !endDate && date && date > startDate) {
-      setEndDate(date);
-    } else {
-      setStartDate(date);
-      setEndDate(null);
-    }
-    setSelectedDay(date);
+    setSelection((prevState) => {
+      if (!prevState.startDate && !prevState.endDate) {
+        return { ...prevState, startDate: date, selectedDay: date };
+      } else if (
+        prevState.startDate &&
+        !prevState.endDate &&
+        date &&
+        date > prevState.startDate
+      ) {
+        return { ...prevState, endDate: date, selectedDay: date };
+      } else {
+        return {
+          ...prevState,
+          startDate: date,
+          endDate: null,
+          selectedDay: date,
+        };
+      }
+    });
   };
 
-  const cancelSelectedDated = () => {
-    setStartDate(null);
-    setEndDate(null);
-    setSelectedDay(null);
+  const cancelSelectedDates = () => {
+    setSelection({
+      startDate: null,
+      endDate: null,
+      selectedDay: null,
+    });
   };
 
-  return {
-    startDate,
-    endDate,
-    selectedDay,
-    handleDayClick,
-    cancelSelectedDated,
-  };
+  return { ...selection, handleDayClick, cancelSelectedDates };
 }

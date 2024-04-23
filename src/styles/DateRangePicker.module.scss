@@ -19,7 +19,7 @@
   &::placeholder {
     font-size: $font-m;
   }
-  @include breakpoint-sm-to-md-and-lower{
+  @include breakpoint-sm-to-md-and-lower {
     width: 7.5rem;
   }
 }
@@ -50,8 +50,8 @@
   background-color: $white-color;
 }
 
-
-.date-range__current-month, .date-range__next-month {
+.date-range__current-month,
+.date-range__next-month {
   @include monthStyles();
 }
 
@@ -60,7 +60,7 @@
   gap: 3rem;
   margin-top: $spacing-ml;
 
-  @include breakpoint-md-and-lower{
+  @include breakpoint-md-and-lower {
     flex-direction: column;
     gap: 0;
   }
@@ -116,13 +116,13 @@
   margin-bottom: $spacing-m;
 }
 
-.days-of-week__day{
+.days-of-week__day {
   text-align: center;
   width: 1.875rem;
   margin-right: 0.5625rem;
   color: $gray-light--1;
-  @include typography-sm-2; 
-  
+  @include typography-sm-2;
+
   @include breakpoint-lg-and-upper {
     width: 2.25rem;
   }
@@ -135,11 +135,13 @@
   margin: $spacing-xxl auto $spacing-lg auto;
 }
 
-.picked-date__start-day, .picked-date__end-day {
+.picked-date__start-day,
+.picked-date__end-day {
   @include inputStyle();
 }
 
-.picked-date__start-day--span, .picked-date__end-day--span {
+.picked-date__start-day--span,
+.picked-date__end-day--span {
   @include inputSpanStyle();
 }
 
@@ -191,7 +193,5 @@
 
 .btn-container {
   @include flex-center(column);
-    margin-right: $spacing-m;
+  margin-right: $spacing-m;
 }
-
-

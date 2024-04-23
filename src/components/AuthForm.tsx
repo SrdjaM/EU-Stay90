@@ -32,7 +32,10 @@ const AuthForm: React.FC = () => {
   }, [location.pathname]);
 
   const resetFormData = () => {
-    dispatch({ type: ActionTypes.SET_AUTH_DATA, payload: { email: "", password: "" } });
+    dispatch({
+      type: ActionTypes.SET_AUTH_DATA,
+      payload: { email: "", password: "" },
+    });
     dispatch({ type: ActionTypes.SET_ERRORS, payload: [] });
     dispatch({ type: ActionTypes.SET_ERROR_MESSAGE, payload: null });
   };
@@ -72,19 +75,22 @@ const AuthForm: React.FC = () => {
         confirmPassword:
           !isSignIn && name === FieldNames.ConfirmPassword
             ? string()
-                .oneOf([state.authData.password], ERROR_MESSAGES.PASSWORDS_MUST_MATCH)
+                .oneOf(
+                  [state.authData.password],
+                  ERROR_MESSAGES.PASSWORDS_MUST_MATCH
+                )
                 .required(ERROR_MESSAGES.CONFIRM_PASSWORD_REQUIRED)
             : string(),
       });
 
       fieldSchema.validateSyncAt(name, { [name]: value });
-      dispatch({ 
-        type: ActionTypes.SET_ERRORS, 
-        payload: state.errors.filter((error) => error.fieldName !== name)
+      dispatch({
+        type: ActionTypes.SET_ERRORS,
+        payload: state.errors.filter((error) => error.fieldName !== name),
       });
     } catch (error: any) {
-      dispatch({ 
-        type: ActionTypes.SET_ERRORS, 
+      dispatch({
+        type: ActionTypes.SET_ERRORS,
         payload: [
           ...state.errors.filter((error) => error.fieldName !== name),
           { fieldName: name as keyof AuthData, message: error.message },
@@ -107,25 +113,36 @@ const AuthForm: React.FC = () => {
         navigate(ROUTES.HOME);
       } else {
         await signUp(state.authData, onSuccess);
-        dispatch({type: ActionTypes.SET_IS_SUCCESS, payload: true});
+        dispatch({ type: ActionTypes.SET_IS_SUCCESS, payload: true });
         navigate(ROUTES.SIGN_IN);
       }
     } catch (error: any) {
       if (error.message === "auth/invalid-credential") {
-        dispatch({ type: ActionTypes.SET_ERROR_MESSAGE , payload: ERROR_MESSAGES.INVALID_EMAIL_OR_PASSWORD });
+        dispatch({
+          type: ActionTypes.SET_ERROR_MESSAGE,
+          payload: ERROR_MESSAGES.INVALID_EMAIL_OR_PASSWORD,
+        });
       } else if (error.message === "auth/too-many-requests") {
-        dispatch({ type: ActionTypes.SET_ERROR_MESSAGE , payload: ERROR_MESSAGES.TO_MANY_REQUESTS });
+        dispatch({
+          type: ActionTypes.SET_ERROR_MESSAGE,
+          payload: ERROR_MESSAGES.TO_MANY_REQUESTS,
+        });
       } else if (error.message === "auth/email-already-in-use") {
-        dispatch({ type: ActionTypes.SET_ERROR_MESSAGE , payload: ERROR_MESSAGES.EMAIL_IN_USE});
+        dispatch({
+          type: ActionTypes.SET_ERROR_MESSAGE,
+          payload: ERROR_MESSAGES.EMAIL_IN_USE,
+        });
       }
     }
   };
 
-  console.log(state.isSuccess);
-
   const isFormValid = () => {
     if (isSignIn) {
-      return state.authData.email && state.authData.password && state.errors.length === 0;
+      return (
+        state.authData.email &&
+        state.authData.password &&
+        state.errors.length === 0
+      );
     } else {
       return (
         state.authData.email &&
@@ -163,7 +180,7 @@ const AuthForm: React.FC = () => {
 
   useEffect(() => {
     resetFormData();
-  }, [location.pathname]); 
+  }, [location.pathname]);
 
   return (
     <form onSubmit={handleSubmit} className={classes.form}>

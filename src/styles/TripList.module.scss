@@ -10,7 +10,7 @@
   color: $black-color;
   @include typography-center;
 
-  @include breakpoint-sm-to-md-and-lower{
+  @include breakpoint-sm-to-md-and-lower {
     font-size: $font-sm;
   }
 }
@@ -20,7 +20,7 @@
   flex-direction: column;
 }
 
-.trip-list__container{
+.trip-list__container {
   max-height: 18.75rem;
   padding: 0 $spacing-m;
   width: 100%;
@@ -31,7 +31,7 @@
   &::-webkit-scrollbar {
     width: 0.5rem;
 
-    @include breakpoint-md-and-lower{
+    @include breakpoint-md-and-lower {
       width: 0.25rem;
     }
   }
@@ -51,17 +51,17 @@
   }
 }
 
-.trip-list__list{
+.trip-list__list {
   padding: 0;
 }
 
-.trip-list__header{
+.trip-list__header {
   color: $black-color;
   padding: $spacing-xs;
   text-transform: uppercase;
 }
 
-.trip-list__count{
+.trip-list__count {
   align-items: center;
   @include displayFlex();
 }
@@ -152,4 +152,3 @@
     grid-row: auto / span 2;
   }
 }
-
