@@ -1,20 +1,17 @@
 import React from "react";
-import classes from "../styles/DateRangePicker.module.scss";
+import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
+import { db } from "../firebase";
+import { addDoc, collection } from "firebase/firestore";
+import { useUser } from "../contexts/UserContext";
+import Button from "./Button";
+
 import { useMonthYear } from "../custom/hooks/useMonthYear";
 import { useDateSelection } from "../custom/hooks/useDateSelection";
 import RoundButton from "../custom/components/RoundButton";
 import { formatDate } from "../custom/utils/dateUtils";
 import { months, daysOfWeek } from "../common/constants/constants";
-
-import {
-  faAngleLeft,
-  faAngleRight,
-  faX,
-  faCheck,
-} from "@fortawesome/free-solid-svg-icons";
-import { db } from "../firebase";
-import { addDoc, collection } from "firebase/firestore";
-import { useUser } from "../contexts/UserContext";
+import { UI_TEXT } from "../common/constants/constants";
+import classes from "../styles/DateRangePicker.module.scss";
 
 interface NewTrip {
   userId: string;
@@ -191,19 +188,17 @@ const DateRangePicker: React.FC = () => {
           className={classes["picked-date__end-day"]}
           readOnly
         />
+      </div>
+      <div className={classes["btn-action"]}>
         <div className={classes["btn-container"]}>
-          <RoundButton
-            onButtonClick={handleConfirmDates}
-            icon={faCheck}
-            ariaLabel="Confirm dates"
-          />
+          <Button onClick={handleConfirmDates} variant="primary">
+            {UI_TEXT.CONFIRM}
+          </Button>
         </div>
         <div className={classes["btn-container"]}>
-          <RoundButton
-            onButtonClick={cancelSelectedDates}
-            icon={faX}
-            ariaLabel="Cancel dates"
-          />
+          <Button onClick={cancelSelectedDates} variant="primary">
+            {UI_TEXT.CANCEL}
+          </Button>
         </div>
       </div>
       <div className={classes["date-range__days"]}>

@@ -24,6 +24,8 @@ export const ROUTES = {
 export const UI_TEXT = {
   SIGN_IN: "Sign In",
   SIGN_UP: "Sign Up",
+  CONFIRM: "Confirm",
+  CANCEL: "Cancel",
 };
 
 export const months = [

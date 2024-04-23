@@ -3,7 +3,8 @@ import DateRangePicker from "../components/DateRangePicker";
 import TripList, { Trip } from "../components/TripList";
 import classes from "../styles/HomePage.module.scss";
 import RoundButton from "../custom/components/RoundButton";
-import { faPlus, faX } from "@fortawesome/free-solid-svg-icons";
+import { faX } from "@fortawesome/free-solid-svg-icons";
+import { faCalendarPlus } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const HomePage: React.FC = () => {
@@ -21,16 +22,18 @@ const HomePage: React.FC = () => {
     <div className={classes["home-page__container"]}>
       <RoundButton
         onButtonClick={openDateRangeHandler}
-        icon={faPlus}
+        icon={faCalendarPlus}
         ariaLabel="Add trip"
         className={classes["btn_add"]}
         iconStyle={classes["btn_add--icon-style"]}
       />
-      <div
-        className={`${classes["btn_close"]} ${addVisibleClass()}`}
-        onClick={closeDateRangeHandler}
-      >
-        <FontAwesomeIcon icon={faX} />
+      <div className={`${classes["btn_close"]} ${addVisibleClass()}`}>
+        <RoundButton
+          onButtonClick={closeDateRangeHandler}
+          icon={faX}
+          ariaLabel="Close calendar"
+          iconStyle={classes["btn_close--icon-style"]}
+        />
       </div>
 
       <div className={`${classes["home-page__picker"]} ${addVisibleClass()}`}>

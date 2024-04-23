@@ -3,31 +3,29 @@
 @import "mixins";
 @import "breakpoints";
 
-.home-page {
-  &__container {
-    padding: $spacing-lg;
-    @include flex-center();
-  }
+.home-page__container {
+  padding: $spacing-lg;
+  @include flex-center();
+}
 
-  &__trips {
-    width: 100%;
-  }
+.home-page__trips {
+  width: 100%;
+}
 
-  &__picker {
-    position: fixed;
-    right: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 999;
-    transform: translateX(100%);
-    transition: transform 0.3s ease;
-  }
+.home-page__picker {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
 
-  &__picker.visible {
-    transform: translateX(0);
-  }
+.home-page__picker.visible {
+  transform: translateX(0);
 }
 
 .btn_add {
@@ -38,22 +36,29 @@
   bottom: 1.5rem;
   right: 1.5rem;
   z-index: 999;
+}
 
-  &--icon-style {
-    color: $primary-color;
-    font-size: $font-xl;
-    font-weight: $bold-fontweight;
-  }
+.btn_add--icon-style {
+  color: $primary-color;
+  font-size: $font-xl;
+  font-weight: $bold-fontweight;
 }
 
 .btn_close {
   position: fixed;
-  right: -1rem;
+  right: -2rem;
   top: 1rem;
   z-index: 1000;
   transition: all 0.3s ease;
+  cursor: pointer;
+}
 
-  &.visible {
-    right: calc(100vw - 2rem);
-  }
+.btn_close.visible {
+  right: calc(100vw - 3rem);
+}
+
+.btn_close--icon-style {
+  color: $primary-color;
+  font-size: $font-m;
+  font-weight: $bold-fontweight;
 }

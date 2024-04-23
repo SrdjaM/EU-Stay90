@@ -132,7 +132,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  margin: $spacing-xxl auto $spacing-lg auto;
+  margin: $spacing-xxl auto $spacing-sm auto;
 }
 
 .picked-date__start-day,
@@ -194,4 +194,9 @@
 .btn-container {
   @include flex-center(column);
   margin-right: $spacing-m;
+}
+
+.btn-action {
+  display: flex;
+  margin-bottom: $spacing-lg;
 }

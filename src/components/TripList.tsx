@@ -6,6 +6,7 @@ import { useUser } from "../contexts/UserContext";
 import { formatDate } from "../custom/utils/dateUtils";
 import classes from "../styles/TripList.module.scss";
 import { months } from "../common/constants/constants";
+import Loader from "./Loader";
 
 const DAYS_AVAILABLE_IN_EU = 90;
 
@@ -15,17 +16,8 @@ export interface Trip {
 }
 
 const TripList: React.FC = () => {
-  const [trips, setTrips] = useState<Trip[]>([
-    { startDate: new Date("2023-01-01"), endDate: new Date("2023-01-10") },
-    { startDate: new Date("2023-02-15"), endDate: new Date("2023-02-25") },
-    { startDate: new Date("2023-03-05"), endDate: new Date("2023-03-15") },
-    { startDate: new Date("2023-04-20"), endDate: new Date("2023-04-30") },
-    { startDate: new Date("2023-05-10"), endDate: new Date("2023-05-20") },
-    { startDate: new Date("2023-06-01"), endDate: new Date("2023-06-11") },
-    { startDate: new Date("2023-01-01"), endDate: new Date("2023-01-10") },
-    { startDate: new Date("2023-05-10"), endDate: new Date("2023-05-20") },
-    { startDate: new Date("2023-06-01"), endDate: new Date("2023-06-11") },
-  ]);
+  const [trips, setTrips] = useState<Trip[]>([]);
+  const [loading, setLoading] = useState(true);
   const { userId } = useUser();
 
   const countDays = (trip: Trip) => {
@@ -72,26 +64,28 @@ const TripList: React.FC = () => {
     }
   };
 
-  //   useEffect(() => {
-  //     const fetchTrips = async () => {
-  //       try {
-  //         const q = query(collection(db, "trips"), where("userId", "==", userId));
-  //         const querySnapshot = await getDocs(q);
-  //         const tripsData: Trip[] = [];
-  //         querySnapshot.forEach((doc) => {
-  //           const tripData = doc.data();
-  //           tripsData.push({
-  //             startDate: new Date(tripData.startDate),
-  //             endDate: new Date(tripData.endDate),
-  //           });
-  //         });
-  //         setTrips(tripsData);
-  //       } catch (error) {
-  //         console.error("Error fetching trips for user:", error);
-  //       }
-  //     };
-  //     fetchTrips();
-  //   }, [userId, trips]);
+  useEffect(() => {
+    const fetchTrips = async () => {
+      try {
+        const q = query(collection(db, "trips"), where("userId", "==", userId));
+        const querySnapshot = await getDocs(q);
+        const tripsData: Trip[] = [];
+        querySnapshot.forEach((doc) => {
+          const tripData = doc.data();
+          tripsData.push({
+            startDate: new Date(tripData.startDate),
+            endDate: new Date(tripData.endDate),
+          });
+        });
+        setTrips(tripsData);
+      } catch (error) {
+        console.error("Error fetching trips for user:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTrips();
+  }, [userId, trips]);
 
   return (
     <div className={classes["trip-list__count"]}>
@@ -119,7 +113,9 @@ const TripList: React.FC = () => {
       </div>
       <h3 className={classes["trip-list__header"]}>Your trips</h3>
       <div className={classes["trip-list__container"]}>
-        {trips.length > 0 ? (
+        {loading ? (
+          <Loader loading={loading} />
+        ) : trips.length > 0 ? (
           <ul className={classes["trip-list__list"]}>{listItems()}</ul>
         ) : (
           <div className={classes["trip-list--empty"]}>
