@@ -3,8 +3,9 @@ import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
 import { db } from "../firebase";
 import { addDoc, collection } from "firebase/firestore";
 import { useUser } from "../contexts/UserContext";
-import Button from "./Button";
+import classNames from "classnames";
 
+import Button from "./Button";
 import { useMonthYear } from "../custom/hooks/useMonthYear";
 import { useDateSelection } from "../custom/hooks/useDateSelection";
 import RoundButton from "../custom/components/RoundButton";
@@ -98,21 +99,16 @@ const DateRangePicker: React.FC = () => {
     return days.map((day, index) => {
       const onDayClick = () => handleDayClick(day.date);
 
-      const dayClasses = [
-        classes["days-grid__day"],
-        day.date === null && classes["days-grid__day--previous-month"],
-        day.isInRange && classes["in-range"],
-        day.date &&
-          selectedDay &&
-          day.date.getTime() === selectedDay.getTime() &&
-          classes["selected-day"],
-        selectedDay &&
+      const dayClasses = classNames(classes["days-grid__day"], {
+        [classes["days-grid__day--previous-month"]]: day.date === null,
+        [classes["in-range"]]: day.isInRange,
+        [classes["selected-day"]]:
           day.date &&
-          day.date < selectedDay &&
-          classes["disabled-day"],
-      ]
-        .filter(Boolean)
-        .join(" ");
+          selectedDay &&
+          day.date.getTime() === selectedDay.getTime(),
+        [classes["disabled-day"]]:
+          selectedDay && day.date && day.date < selectedDay,
+      });
 
       return (
         <div

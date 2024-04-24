@@ -5,7 +5,6 @@ import classes from "../styles/HomePage.module.scss";
 import RoundButton from "../custom/components/RoundButton";
 import { faX } from "@fortawesome/free-solid-svg-icons";
 import { faCalendarPlus } from "@fortawesome/free-regular-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const HomePage: React.FC = () => {
   const [openDateRange, setOpenDateRange] = useState(false);

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "../firebase";
 import { useUser } from "../contexts/UserContext";
 
@@ -65,10 +65,12 @@ const TripList: React.FC = () => {
   };
 
   useEffect(() => {
-    const fetchTrips = async () => {
-      try {
-        const q = query(collection(db, "trips"), where("userId", "==", userId));
-        const querySnapshot = await getDocs(q);
+    setLoading(true);
+    const q = query(collection(db, "trips"), where("userId", "==", userId));
+
+    const unsubscribe = onSnapshot(
+      q,
+      (querySnapshot) => {
         const tripsData: Trip[] = [];
         querySnapshot.forEach((doc) => {
           const tripData = doc.data();
@@ -78,14 +80,32 @@ const TripList: React.FC = () => {
           });
         });
         setTrips(tripsData);
-      } catch (error) {
-        console.error("Error fetching trips for user:", error);
-      } finally {
+        setLoading(false);
+      },
+      (error) => {
+        console.error("Error listening to trips updates:", error);
         setLoading(false);
       }
-    };
-    fetchTrips();
-  }, [userId, trips]);
+    );
+    return () => unsubscribe();
+  }, [userId]);
+
+  const renderTripList = () => {
+    if (loading) {
+      return <Loader loading={loading} />;
+    } else if (trips.length > 0) {
+      return <ul className={classes["trip-list__list"]}>{listItems()}</ul>;
+    } else {
+      return (
+        <div className={classes["trip-list--empty"]}>
+          You don't have any trips yet!
+        </div>
+      );
+    }
+  };
+
+  console.log(trips);
+  console.log(loading);
 
   return (
     <div className={classes["trip-list__count"]}>
@@ -112,17 +132,7 @@ const TripList: React.FC = () => {
         </div>
       </div>
       <h3 className={classes["trip-list__header"]}>Your trips</h3>
-      <div className={classes["trip-list__container"]}>
-        {loading ? (
-          <Loader loading={loading} />
-        ) : trips.length > 0 ? (
-          <ul className={classes["trip-list__list"]}>{listItems()}</ul>
-        ) : (
-          <div className={classes["trip-list--empty"]}>
-            You don't have any trips yet!
-          </div>
-        )}
-      </div>
+      <div className={classes["trip-list__container"]}>{renderTripList()}</div>
     </div>
   );
 };

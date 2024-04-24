@@ -82,10 +82,11 @@
 .days-grid__day {
   width: 1.875rem;
   height: 1.875rem;
+  color: $dark-blue--1;
   border-radius: $border-radius-round;
   @include flex-center();
   border: $thin-border--blue;
-  font-size: $font-m;
+  font-weight: $bold-fontweight;
   box-shadow: $box-shadow-light;
   transition: transform 0.3s ease;
   cursor: pointer;

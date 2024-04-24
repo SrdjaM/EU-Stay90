@@ -1,6 +1,6 @@
 import React from "react";
 import classes from "../styles/Button.module.scss";
-import classNames from "classnames"
+import classNames from "classnames";
 
 type typeOptions = "submit" | "reset" | "button";
 
@@ -21,12 +21,20 @@ const Button: React.FC<ButtonProps> = ({
   disabled,
   onClick,
 }) => {
+  const handleClick = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    if (onClick) {
+      onClick();
+      event.currentTarget.blur();
+    }
+  };
 
   const buttonClass = classNames(classes.button, classes[variant], className);
 
   return (
     <button
-      onClick={onClick}
+      onClick={handleClick}
       className={buttonClass}
       type={type}
       disabled={disabled}
