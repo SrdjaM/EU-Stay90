@@ -26,14 +26,27 @@ const TripList: React.FC = () => {
     );
   };
 
+  const filterTripsLast180Days = () => {
+    if (trips.length === 0) return [];
+
+    const lastTrip = trips[0];
+    const last180DaysDate = new Date(lastTrip.endDate);
+    last180DaysDate.setDate(lastTrip.endDate.getDate() - 180);
+
+    return trips.filter(
+      (trip) =>
+        trip.startDate >= last180DaysDate && trip.endDate <= lastTrip.endDate
+    );
+  };
+
   const getTotalDays = () => {
-    return trips.reduce((total, trip) => {
-      return total + countDays(trip);
-    }, 0);
+    const last180DaysTrips = filterTripsLast180Days();
+    return last180DaysTrips.reduce((total, trip) => total + countDays(trip), 0);
   };
 
   const listItems = () => {
-    return trips.map((trip, index) => (
+    const last180DaysTrips = filterTripsLast180Days();
+    return last180DaysTrips.map((trip, index) => (
       <li key={index} className={classes["trip__list"]}>
         <div className={classes["trip__container"]}>
           <span className={classes["trip__start-date"]}>
@@ -67,7 +80,6 @@ const TripList: React.FC = () => {
   useEffect(() => {
     setLoading(true);
     const q = query(collection(db, "trips"), where("userId", "==", userId));
-
     const unsubscribe = onSnapshot(
       q,
       (querySnapshot) => {
@@ -79,6 +91,8 @@ const TripList: React.FC = () => {
             endDate: new Date(tripData.endDate),
           });
         });
+        tripsData.sort((a, b) => b.startDate.getTime() - a.startDate.getTime());
+
         setTrips(tripsData);
         setLoading(false);
       },
@@ -104,8 +118,27 @@ const TripList: React.FC = () => {
     }
   };
 
-  console.log(trips);
-  console.log(loading);
+  const getNextFull90Days = () => {
+    if (trips.length === 0) return new Date();
+
+    const lastTrip = trips[0];
+    const resetDate = new Date(lastTrip.endDate);
+    resetDate.setDate(resetDate.getDate() + 180);
+
+    return resetDate;
+  };
+
+  const renderNextFull90Days = () => {
+    const nextFull90Days = getNextFull90Days();
+    return (
+      <div className={classes["trips-refill"]}>
+        <span className={classes["trips-refill--date"]}>
+          {formatDate(nextFull90Days, months)}
+        </span>
+        <div>Next full 90 days date</div>
+      </div>
+    );
+  };
 
   return (
     <div className={classes["trip-list__count"]}>
@@ -126,12 +159,11 @@ const TripList: React.FC = () => {
             {daysLeft >= 0 && ` days left`}
           </span>
         </div>
-        <div className={classes["trips-refill"]}>
-          <span className={classes["trips-refill--date"]}>27 March 2025</span>
-          <div>Next full 90 days on</div>
-        </div>
+        {renderNextFull90Days()}
       </div>
-      <h3 className={classes["trip-list__header"]}>Your trips</h3>
+      <h3 className={classes["trip-list__header"]}>
+        Your trips in last 180 days
+      </h3>
       <div className={classes["trip-list__container"]}>{renderTripList()}</div>
     </div>
   );
