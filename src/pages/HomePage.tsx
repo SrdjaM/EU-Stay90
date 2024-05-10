@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import DateRangePicker from "../components/DateRangePicker";
-import TripList, { Trip } from "../components/TripList";
+import TripList from "../components/TripList";
 import classes from "../styles/HomePage.module.scss";
 import RoundButton from "../custom/components/RoundButton";
 import { faX } from "@fortawesome/free-solid-svg-icons";

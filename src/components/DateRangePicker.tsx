@@ -95,9 +95,42 @@ const DateRangePicker: React.FC = () => {
   const formattedStartDate = startDate ? formatDate(startDate, months) : "";
   const formattedEndDate = endDate ? formatDate(endDate, months) : "";
 
-  const renderDaysGrid = (days: Day[]) => {
+  const renderDaysGrid = (days: Day[], startingIndex: number = 0) => {
     return days.map((day, index) => {
-      const onDayClick = () => handleDayClick(day.date);
+      const adjustedIndex = index + startingIndex;
+
+      const onDayClick = () => {
+        if (day.date) handleDayClick(day.date);
+      };
+
+      const tabIndex = index === 0 ? 0 : -1;
+
+      const handleKeyDown = (event: React.KeyboardEvent) => {
+        switch (event.key) {
+          case "Enter":
+            event.preventDefault();
+            if (day.date) handleDayClick(day.date);
+            break;
+          case "ArrowRight":
+            event.preventDefault();
+            moveFocus(adjustedIndex, 1);
+            break;
+          case "ArrowLeft":
+            event.preventDefault();
+            moveFocus(adjustedIndex, -1);
+            break;
+          case "ArrowDown":
+            event.preventDefault();
+            moveFocus(adjustedIndex, 7);
+            break;
+          case "ArrowUp":
+            event.preventDefault();
+            moveFocus(adjustedIndex, -7);
+            break;
+          default:
+            break;
+        }
+      };
 
       const dayClasses = classNames(classes["days-grid__day"], {
         [classes["days-grid__day--previous-month"]]: day.date === null,
@@ -114,12 +147,22 @@ const DateRangePicker: React.FC = () => {
         <div
           key={day.date ? day.date.getTime() : `empty-${index}`}
           className={dayClasses}
+          tabIndex={tabIndex}
           onClick={onDayClick}
+          onKeyDown={handleKeyDown}
         >
           {day.dayOfMonth}
         </div>
       );
     });
+  };
+
+  const moveFocus = (currentIndex: number, moveBy: number) => {
+    const newFocusIndex = currentIndex + moveBy;
+    const allDays = document.querySelectorAll("." + classes["days-grid__day"]);
+    const targetElement = allDays[newFocusIndex] as HTMLElement;
+
+    targetElement?.focus();
   };
 
   const handlePreviousMonth = () => {
@@ -156,6 +199,9 @@ const DateRangePicker: React.FC = () => {
     }
   };
 
+  const currentMonthDays = generateDaysInMonth(currentYear, currentMonth, true);
+  const nextMonthDays = generateDaysInMonth(nextYear, nextMonth, true);
+
   return (
     <div className={classes["date-range"]}>
       <div className={classes["picked-date"]}>
@@ -170,6 +216,7 @@ const DateRangePicker: React.FC = () => {
           placeholder="Start Date"
           className={classes["picked-date__start-day"]}
           readOnly
+          tabIndex={-1}
         />
 
         {endDate && (
@@ -183,6 +230,7 @@ const DateRangePicker: React.FC = () => {
           placeholder="End Date"
           className={classes["picked-date__end-day"]}
           readOnly
+          tabIndex={-1}
         />
       </div>
       <div className={classes["btn-action"]}>
@@ -210,9 +258,7 @@ const DateRangePicker: React.FC = () => {
           </div>
           <div className={classes["days-of-week"]}>{renderDaysOfWeek()}</div>
           <div className={classes["days-grid"]}>
-            {renderDaysGrid(
-              generateDaysInMonth(currentYear, currentMonth, true)
-            )}
+            {renderDaysGrid(currentMonthDays)}
           </div>
         </div>
         <div>
@@ -228,9 +274,7 @@ const DateRangePicker: React.FC = () => {
 
           <div className={classes["days-of-week"]}>{renderDaysOfWeek()}</div>
           <div className={classes["days-grid"]}>
-            {renderDaysGrid(
-              generateDaysInMonth(currentYear, currentMonth + 1, true)
-            )}
+            {renderDaysGrid(nextMonthDays, currentMonthDays.length)}
           </div>
         </div>
       </div>
