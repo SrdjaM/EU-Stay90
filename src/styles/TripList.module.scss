@@ -156,9 +156,16 @@
 .trip__start-date {
   min-width: 8.5rem;
   text-align: start;
+  @include breakpoint-sm-to-md-and-lower {
+    min-width: none;
+  }
 }
 
 .trip_end-date {
   min-width: 8.5rem;
   text-align: end;
+  @include breakpoint-sm-to-md-and-lower {
+    min-width: none;
+    text-align: start;
+  }
 }
