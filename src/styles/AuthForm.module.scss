@@ -14,7 +14,7 @@
   }
 }
 
-.form-input{
+.form-input {
   width: 80%;
   height: 1.5rem;
   margin-bottom: $spacing-sm;
@@ -29,13 +29,13 @@
   }
 }
 
-.form-input__error{
+.form-input__error {
   @include typography-sm;
   color: $error-color;
   margin-bottom: $spacing-sm;
 }
 
-.form-input:focus{
+.form-input:focus {
   outline: $focus-outline;
 }
 

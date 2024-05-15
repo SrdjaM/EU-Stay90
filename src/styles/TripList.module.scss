@@ -1,0 +1,171 @@
+@import "colors";
+@import "_variables";
+@import "mixins";
+@import "breakpoints";
+
+@mixin boxStyle {
+  border: $thick-border--light;
+  box-shadow: $box-shadow-light;
+  padding: $spacing-sm;
+  color: $black-color;
+  @include typography-center;
+
+  @include breakpoint-sm-to-md-and-lower {
+    font-size: $font-sm;
+  }
+}
+
+@mixin displayFlex {
+  display: flex;
+  flex-direction: column;
+}
+
+.trip-list__container {
+  max-height: 18.75rem;
+  padding: 0 $spacing-m;
+  width: 100%;
+  text-align: center;
+  overflow-y: scroll;
+  position: relative;
+
+  &::-webkit-scrollbar {
+    width: 0.5rem;
+
+    @include breakpoint-md-and-lower {
+      width: 0.25rem;
+    }
+  }
+  &::-webkit-scrollbar-track {
+    background: $gray-light--1;
+    border-radius: $border-radius-s;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: $primary-color;
+    border-radius: $border-radius-s;
+    height: 4rem;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: $black-color;
+    border-radius: $border-radius-s;
+  }
+}
+
+.trip-list__list {
+  padding: 0;
+}
+
+.trip-list__header {
+  color: $black-color;
+  padding: $spacing-xs;
+  text-transform: uppercase;
+}
+
+.trip-list__count {
+  align-items: center;
+  @include displayFlex();
+}
+
+.trip-list__total-trips {
+  align-self: self-start;
+  padding: $spacing-m $spacing-m $spacing-m 0;
+}
+
+.trip-list__total-trips .trips-spent {
+  @include boxStyle();
+  @include displayFlex();
+  border-top-right-radius: $spacing-m;
+
+  &--total-days {
+    font-size: $font-xl;
+    color: $primary-color;
+  }
+}
+
+.trip-list__total-trips .trips-spent--total-days {
+  font-size: $font-xl;
+  color: $primary-color;
+}
+
+.trip-list__total-trips .trips-refill {
+  @include boxStyle();
+  @include displayFlex();
+  border-bottom-right-radius: $spacing-m;
+}
+
+.trip-list__total-trips .trips-refill--date {
+  font-size: $font-m;
+  color: $primary-color;
+}
+
+.trip-list__total-trips .trips-left {
+  @include displayFlex();
+  @include boxStyle();
+  border-top: none;
+}
+
+.trip-list__total-trips .trips-left--exceeded {
+  font-size: $font-m;
+  color: $error-color;
+}
+
+.trip-list--empty {
+  font-size: $font-lg;
+  color: $error-color;
+}
+
+.trip__list {
+  list-style: none;
+}
+
+.trip__container {
+  @include boxStyle();
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-sm;
+  margin-bottom: $spacing-xs;
+  color: $black-color;
+  font-weight: $bold-fontweight;
+
+  @include breakpoint-md-and-lower {
+    font-size: $font-sm;
+  }
+
+  @include breakpoint-sm-to-md-and-lower {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.25rem;
+  }
+}
+
+.trip__total-days {
+  background-color: $black-color;
+  border: $thin-border;
+  border-radius: 1rem;
+  padding: $spacing-sm;
+  color: $white-color;
+  font-size: $font-sm;
+  @include breakpoint-sm-to-md-and-lower {
+    grid-column-start: 2;
+    grid-column-end: 3;
+    grid-row: auto / span 2;
+  }
+}
+
+.trip__start-date {
+  min-width: 8.5rem;
+  text-align: start;
+  @include breakpoint-sm-to-md-and-lower {
+    min-width: none;
+  }
+}
+
+.trip_end-date {
+  min-width: 8.5rem;
+  text-align: end;
+  @include breakpoint-sm-to-md-and-lower {
+    min-width: none;
+    text-align: start;
+  }
+}

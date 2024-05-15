@@ -8,7 +8,10 @@ export const initialState: AuthFormState = {
   isSuccess: false,
 };
 
-export const reducer = (state: AuthFormState, action: Action): AuthFormState => {
+export const reducer = (
+  state: AuthFormState,
+  action: Action
+): AuthFormState => {
   switch (action.type) {
     case ActionTypes.SET_AUTH_DATA:
       return { ...state, authData: action.payload };

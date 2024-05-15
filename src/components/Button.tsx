@@ -1,6 +1,6 @@
 import React from "react";
 import classes from "../styles/Button.module.scss";
-import classNames from "classnames"
+import classNames from "classnames";
 
 type typeOptions = "submit" | "reset" | "button";
 
@@ -21,7 +21,6 @@ const Button: React.FC<ButtonProps> = ({
   disabled,
   onClick,
 }) => {
-
   const buttonClass = classNames(classes.button, classes[variant], className);
 
   return (

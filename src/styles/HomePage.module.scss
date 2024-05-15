@@ -1,0 +1,68 @@
+@import "colors.scss";
+@import "_variables";
+@import "mixins";
+@import "breakpoints";
+
+.home-page__container {
+  padding: $spacing-lg;
+  @include flex-center();
+}
+
+.home-page__trips {
+  width: 100%;
+}
+
+.home-page__picker {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  visibility: hidden;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+.home-page__picker.visible {
+  visibility: visible;
+  transform: translateX(0);
+}
+
+.btn_add {
+  width: 3.75rem !important;
+  height: 3.75rem !important;
+  box-shadow: $box-shadow-xl;
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 999;
+}
+
+.btn_add--icon-style {
+  color: $primary-color;
+  font-size: $font-xl;
+  font-weight: $bold-fontweight;
+}
+
+.btn_close {
+  position: fixed;
+  right: -2rem;
+  top: 1rem;
+  z-index: 1000;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  visibility: hidden;
+}
+
+.btn_close.visible {
+  visibility: visible;
+  right: calc(100vw - 3rem);
+}
+
+.btn_close--icon-style {
+  color: $primary-color;
+  font-size: $font-m;
+  font-weight: $bold-fontweight;
+}

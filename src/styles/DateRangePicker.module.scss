@@ -1,0 +1,204 @@
+@import "colors.scss";
+@import "_variables";
+@import "mixins";
+@import "breakpoints";
+
+@mixin monthStyles {
+  @include flex-center();
+  position: relative;
+  @include typography-center;
+  color: $black-color;
+  margin-bottom: $spacing-lg;
+}
+
+@mixin inputStyle {
+  padding: $spacing-m $spacing-sm;
+  border: $thick-border--light;
+  font-size: $font-m;
+
+  &::placeholder {
+    font-size: $font-m;
+  }
+  @include breakpoint-sm-to-md-and-lower {
+    width: 7.5rem;
+  }
+}
+
+@mixin inputSpanStyle {
+  position: absolute;
+  top: -0.6rem;
+  color: $gray-light--1;
+  background-color: $white-color;
+  @include typography-sm;
+  padding: $spacing-xxs;
+  border: $thick-border--light;
+  text-transform: uppercase;
+}
+
+@mixin hoverSelected {
+  background-color: $primary-color;
+  transform: translateY(-2px);
+  box-shadow: $box-shadow-xl;
+}
+
+.date-range {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: $white-color;
+  overflow-y: scroll;
+}
+
+.date-range__current-month,
+.date-range__next-month {
+  @include monthStyles();
+}
+
+.date-range__days {
+  display: flex;
+  gap: 3rem;
+  margin-top: $spacing-ml;
+
+  @include breakpoint-md-and-lower {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+.days-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(7, 1.875rem);
+  grid-template-rows: repeat(6, 1.875rem);
+  gap: 0.625rem;
+
+  @include breakpoint-lg-and-upper {
+    grid-template-columns: repeat(7, 2.25rem);
+    grid-template-rows: repeat(6, 2.25rem);
+  }
+}
+
+.days-grid__day {
+  width: 1.875rem;
+  height: 1.875rem;
+  color: $dark-blue--1;
+  border-radius: $border-radius-round;
+  @include flex-center();
+  border: $thin-border--blue;
+  font-weight: $bold-fontweight;
+  box-shadow: $box-shadow-light;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+
+  &:hover {
+    @include hoverSelected();
+  }
+
+  @include breakpoint-lg-and-upper {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+}
+
+.days-grid__day--previous-month {
+  color: $gray-light--1;
+  pointer-events: none;
+  // Left for design purposes to determine whether to see previous days or not
+  // color: transparent;
+  // border: none;
+  // box-shadow: none;
+}
+
+.days-of-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.0625rem;
+  margin-bottom: $spacing-m;
+}
+
+.days-of-week__day {
+  text-align: center;
+  width: 1.875rem;
+  margin-right: 0.5625rem;
+  color: $gray-light--1;
+  @include typography-sm-2;
+
+  @include breakpoint-lg-and-upper {
+    width: 2.25rem;
+  }
+}
+
+.picked-date {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: $spacing-xxl auto $spacing-sm auto;
+}
+
+.picked-date__start-day,
+.picked-date__end-day {
+  @include inputStyle();
+}
+
+.picked-date__start-day--span,
+.picked-date__end-day--span {
+  @include inputSpanStyle();
+}
+
+.picked-date__start-day {
+  border-right: none;
+  border-top-left-radius: $border-radius-s;
+  border-bottom-left-radius: $border-radius-s;
+}
+
+.picked-date__start-day--span {
+  left: 0.625rem;
+}
+
+.picked-date__end-day {
+  border-left: none;
+  border-top-right-radius: $border-radius-s;
+  border-bottom-right-radius: $border-radius-s;
+}
+
+.picked-date__end-day--span {
+  left: 12.0625rem;
+}
+
+.left {
+  position: absolute;
+  left: 0;
+}
+
+.right {
+  position: absolute;
+  right: 0.3125rem;
+  left: auto !important;
+}
+
+.in-range {
+  background-color: $primary-color;
+}
+
+.selected-day {
+  @include hoverSelected();
+}
+
+.disabled-day {
+  pointer-events: none;
+  &:not(.in-range) {
+    opacity: 0.5;
+  }
+}
+
+.btn-container {
+  @include flex-center(column);
+  margin-right: $spacing-m;
+}
+
+.btn-action {
+  display: flex;
+  margin-bottom: $spacing-lg;
+}

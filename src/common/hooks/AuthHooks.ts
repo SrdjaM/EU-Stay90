@@ -20,8 +20,13 @@ export const useAuthentication = () => {
   const signIn = async (data: AuthData, onSuccess: () => void) => {
     try {
       const auth = getAuth(app);
-      await signInWithEmailAndPassword(auth, data.email, data.password);
-      login();
+      const userCredentials = await signInWithEmailAndPassword(
+        auth,
+        data.email,
+        data.password
+      );
+      const token = await userCredentials.user.getIdToken();
+      login(token);
       onSuccess();
     } catch (error: any) {
       throw new Error(error.code);
@@ -36,7 +41,7 @@ export const useAuthentication = () => {
         username: data.username,
         email: data.email,
         password: data.password,
-      }); 
+      });
       onSuccess();
     } catch (error: any) {
       throw Error(error.code);

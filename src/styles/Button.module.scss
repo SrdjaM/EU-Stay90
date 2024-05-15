@@ -30,7 +30,7 @@
   color: $light-blue--2;
 
   &:hover,
-  &:focus {
+  &:active {
     background-color: $dark-blue--1;
     color: $very-light-blue--1;
     box-shadow: $box-shadow-lg;
@@ -42,11 +42,10 @@
   color: $very-light-blue--1;
 
   &:hover,
-  &:focus {
+  &:active {
     background-color: $very-light-blue--1;
     color: $light-blue--2;
     border: 1px solid $dark-blue--1;
     box-shadow: $box-shadow-lg;
   }
 }
-

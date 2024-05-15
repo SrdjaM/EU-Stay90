@@ -17,35 +17,35 @@
   }
 }
 
-.login-page__container{
-    width: 18.75rem;
-    padding: $spacing-sm;
-    background: $white-color;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border: $thick-border--dark;
-    border-radius: $border-radius-xs;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    box-shadow: $box-shadow-xl;
+.login-page__container {
+  width: 18.75rem;
+  padding: $spacing-sm;
+  background: $white-color;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: $thick-border--dark;
+  border-radius: $border-radius-xs;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: $box-shadow-xl;
 
-    @include breakpoint-sm-and-lower {
-      width: 15rem;
-    }
+  @include breakpoint-sm-and-lower {
+    width: 15rem;
+  }
 }
 
-.signup__container{
+.signup__container {
   margin: $spacing-ml 0 $spacing-xl 0;
   text-align: center;
 }
 
-.signup__text{
+.signup__text {
   font-size: $font-sm;
 }
-.signup__link{
+.signup__link {
   @include typography-sm-2;
   margin-left: $spacing-sm;
   color: $dark-blue--1;

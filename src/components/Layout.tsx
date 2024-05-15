@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import HomePage from "../pages/HomePage";
 import Button from "./Button";
 
 const Layout: React.FC = () => {
@@ -14,12 +15,12 @@ const Layout: React.FC = () => {
   };
   return (
     <div>
-      <h1>Layout</h1>
       <div>
         <Button variant="primary" onClick={handleLogout}>
           Sign Out
         </Button>
       </div>
+      <HomePage />
     </div>
   );
 };

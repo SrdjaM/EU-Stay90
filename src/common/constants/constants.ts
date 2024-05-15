@@ -18,10 +18,29 @@ export const ERROR_MESSAGES = {
 export const ROUTES = {
   HOME: "/",
   SIGN_IN: "/signin",
-  SIGN_UP: "/signup"
-}
+  SIGN_UP: "/signup",
+};
 
 export const UI_TEXT = {
   SIGN_IN: "Sign In",
-  SIGN_UP: "Sign Up"
-}
+  SIGN_UP: "Sign Up",
+  CONFIRM: "Confirm",
+  CANCEL: "Cancel",
+};
+
+export const months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+export const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];

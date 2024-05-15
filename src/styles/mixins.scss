@@ -14,3 +14,16 @@
   font-size: 0.875rem;
   font-weight: $bold-fontweight;
 }
+
+@mixin typography-center {
+  font-weight: $bold-fontweight;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+@mixin flex-center($direction: row, $justify: center, $align: center) {
+  display: flex;
+  flex-direction: $direction;
+  justify-content: $justify;
+  align-items: $align;
+}
