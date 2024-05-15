@@ -46,11 +46,17 @@ const AuthForm: React.FC = () => {
       type: ActionTypes.SET_AUTH_DATA,
       payload: { ...state.authData, [name]: value },
     });
-    validateField(name, value);
+    if (state.touched[name]) {
+      validateField(name, value);
+    }
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    dispatch({
+      type: ActionTypes.SET_TOUCHED,
+      payload: { ...state.touched, [name]: true },
+    });
     validateField(name, value);
   };
 
