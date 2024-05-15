@@ -46,6 +46,7 @@ const AuthForm: React.FC = () => {
       type: ActionTypes.SET_AUTH_DATA,
       payload: { ...state.authData, [name]: value },
     });
+    validateField(name, value);
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
