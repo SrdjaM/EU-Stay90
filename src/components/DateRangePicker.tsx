@@ -109,7 +109,9 @@ const DateRangePicker: React.FC = () => {
         switch (event.key) {
           case "Enter":
             event.preventDefault();
-            if (day.date) handleDayClick(day.date);
+            if (day.date) {
+              handleDayClick(day.date);
+            }
             break;
           case "ArrowRight":
             event.preventDefault();

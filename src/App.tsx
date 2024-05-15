@@ -10,14 +10,12 @@ function App() {
   return (
     <div className={classes.app}>
       <Routes>
-        {isAuthenticated && (
+        {isAuthenticated ? (
           <>
             <Route path="/" element={<Layout />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </>
-        )}
-
-        {!isAuthenticated && (
+        ) : (
           <>
             <Route path="/signin" element={<LoginPage />} />
             <Route path="/signup" element={<LoginPage />} />

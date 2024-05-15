@@ -21,20 +21,11 @@ const Button: React.FC<ButtonProps> = ({
   disabled,
   onClick,
 }) => {
-  const handleClick = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    if (onClick) {
-      onClick();
-      event.currentTarget.blur();
-    }
-  };
-
   const buttonClass = classNames(classes.button, classes[variant], className);
 
   return (
     <button
-      onClick={handleClick}
+      onClick={onClick}
       className={buttonClass}
       type={type}
       disabled={disabled}
