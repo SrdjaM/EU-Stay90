@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
 import { db } from "../firebase";
 import { addDoc, collection } from "firebase/firestore";
 import { useUser } from "../contexts/UserContext";
 import classNames from "classnames";
+import * as yup from "yup";
 
 import Button from "./Button";
 import { useMonthYear } from "../custom/hooks/useMonthYear";
@@ -33,6 +34,10 @@ interface Day {
 }
 
 const DateRangePicker: React.FC = () => {
+  const [inputStartDate, setInputStartDate] = useState<string>("");
+  const [inputEndDate, setInputEndDate] = useState<string>("");
+  const [inputDateError, setInputDateError] = useState<string | null>(null);
+
   const { currentMonth, currentYear, changeMonth, getNextMonthAndYear } =
     useMonthYear();
   const {
@@ -41,7 +46,23 @@ const DateRangePicker: React.FC = () => {
     selectedDay,
     handleDayClick,
     cancelSelectedDates,
+    isCancelled,
+    resetCancellation,
   } = useDateSelection();
+
+  useEffect(() => {
+    setInputStartDate(startDate ? formatDate(startDate, months) : "");
+    setInputEndDate(endDate ? formatDate(endDate, months) : "");
+  }, [startDate, endDate]);
+
+  useEffect(() => {
+    if (isCancelled) {
+      setInputStartDate("");
+      setInputEndDate("");
+      setInputDateError(null);
+      resetCancellation();
+    }
+  }, [isCancelled]);
 
   const { userId } = useUser();
 
@@ -91,9 +112,6 @@ const DateRangePicker: React.FC = () => {
   };
 
   const { month: nextMonth, year: nextYear } = getNextMonthAndYear();
-
-  const formattedStartDate = startDate ? formatDate(startDate, months) : "";
-  const formattedEndDate = endDate ? formatDate(endDate, months) : "";
 
   const renderDaysGrid = (days: Day[], startingIndex: number = 0) => {
     return days.map((day, index) => {
@@ -185,20 +203,78 @@ const DateRangePicker: React.FC = () => {
 
   const handleConfirmDates = async () => {
     try {
-      if (startDate && endDate) {
+      if (inputStartDate && inputEndDate) {
+        const isValidStartDate = dateSchema.isValidSync(inputStartDate);
+        const isValidEndDate = dateSchema.isValidSync(inputEndDate);
+
+        if (!isValidStartDate || !isValidEndDate) {
+          return;
+        }
+        const startDateISO = new Date(inputStartDate).toISOString();
+        const endDateISO = new Date(inputEndDate).toISOString();
+
         const newTrip: NewTrip = {
           userId: userId || "",
-          startDate: startDate.toISOString(),
-          endDate: endDate.toISOString(),
+          startDate: startDateISO,
+          endDate: endDateISO,
         };
 
         await addDoc(collection(db, "trips"), newTrip);
 
         cancelSelectedDates();
+        setInputStartDate("");
+        setInputEndDate("");
       }
-    } catch (error) {
-      console.error("Error adding trip:", error);
+    } catch (error: any) {
+      setInputDateError(error.message);
     }
+  };
+
+  const dateSchema = yup
+    .string()
+    .matches(
+      /^(0?[1-9]|[12][0-9]|3[01])\s(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s\d{4}$/i,
+      "Date must be in format DD Month YYYY, e.g., 22 May 1987!"
+    );
+
+  const validateDate = (
+    date: string,
+    setError: React.Dispatch<React.SetStateAction<string | null>>
+  ) => {
+    try {
+      dateSchema.validateSync(date);
+      setError(null);
+    } catch (error) {
+      setError((error as yup.ValidationError).message);
+    }
+  };
+
+  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setInputStartDate(value);
+
+    if (dateSchema.isValidSync(value)) {
+      const date = new Date(value);
+      handleDayClick(date);
+    }
+  };
+
+  const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setInputEndDate(e.target.value);
+
+    if (dateSchema.isValidSync(value)) {
+      const date = new Date(value);
+      handleDayClick(date);
+    }
+  };
+
+  const handleStartDateBlur = () => {
+    validateDate(inputStartDate, setInputDateError);
+  };
+
+  const handleEndDateBlur = () => {
+    validateDate(inputEndDate, setInputDateError);
   };
 
   const currentMonthDays = generateDaysInMonth(currentYear, currentMonth, true);
@@ -207,33 +283,36 @@ const DateRangePicker: React.FC = () => {
   return (
     <div className={classes["date-range"]}>
       <div className={classes["picked-date"]}>
-        {startDate && (
+        {inputStartDate && (
           <span className={classes["picked-date__start-day--span"]}>
             start date
           </span>
         )}
         <input
           type="text"
-          value={formattedStartDate}
+          value={inputStartDate}
           placeholder="Start Date"
           className={classes["picked-date__start-day"]}
-          readOnly
-          tabIndex={-1}
+          onChange={handleStartDateChange}
+          onBlur={handleStartDateBlur}
         />
 
-        {endDate && (
+        {inputEndDate && (
           <span className={classes["picked-date__end-day--span"]}>
             end date
           </span>
         )}
         <input
           type="text"
-          value={formattedEndDate}
+          value={inputEndDate}
           placeholder="End Date"
           className={classes["picked-date__end-day"]}
-          readOnly
-          tabIndex={-1}
+          onChange={handleEndDateChange}
+          onBlur={handleEndDateBlur}
         />
+      </div>
+      <div className={classes["input-error"]}>
+        {inputDateError && <span>{inputDateError}</span>}
       </div>
       <div className={classes["btn-action"]}>
         <div className={classes["btn-container"]}>

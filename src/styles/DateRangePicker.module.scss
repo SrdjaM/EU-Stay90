@@ -202,3 +202,9 @@
   display: flex;
   margin-bottom: $spacing-lg;
 }
+
+.input-error {
+  @include typography-sm;
+  color: $error-color;
+  margin-bottom: $spacing-sm;
+}
