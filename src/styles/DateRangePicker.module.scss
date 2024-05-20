@@ -16,6 +16,21 @@
   border: $thick-border--light;
   font-size: $font-m;
 
+  &::-webkit-calendar-picker-indicator {
+    display: none;
+  }
+  &::-webkit-inner-spin-button,
+  &::-webkit-clear-button {
+    display: none;
+    -webkit-appearance: none;
+  }
+  &::-ms-clear {
+    display: none;
+  }
+  &::-ms-expand {
+    display: none;
+  }
+
   &::placeholder {
     font-size: $font-m;
   }
@@ -151,6 +166,7 @@
   border-right: none;
   border-top-left-radius: $border-radius-s;
   border-bottom-left-radius: $border-radius-s;
+  color: $gray-light--1;
 }
 
 .picked-date__start-day--span {
@@ -161,6 +177,7 @@
   border-left: none;
   border-top-right-radius: $border-radius-s;
   border-bottom-right-radius: $border-radius-s;
+  color: $gray-light--1;
 }
 
 .picked-date__end-day--span {

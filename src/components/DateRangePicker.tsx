@@ -10,7 +10,6 @@ import Button from "./Button";
 import { useMonthYear } from "../custom/hooks/useMonthYear";
 import { useDateSelection } from "../custom/hooks/useDateSelection";
 import RoundButton from "../custom/components/RoundButton";
-import { formatDate } from "../custom/utils/dateUtils";
 import { months, daysOfWeek } from "../common/constants/constants";
 import { UI_TEXT } from "../common/constants/constants";
 import classes from "../styles/DateRangePicker.module.scss";
@@ -51,8 +50,8 @@ const DateRangePicker: React.FC = () => {
   } = useDateSelection();
 
   useEffect(() => {
-    setInputStartDate(startDate ? formatDate(startDate, months) : "");
-    setInputEndDate(endDate ? formatDate(endDate, months) : "");
+    setInputStartDate(startDate ? startDate.toISOString().split("T")[0] : "");
+    setInputEndDate(endDate ? endDate.toISOString().split("T")[0] : "");
   }, [startDate, endDate]);
 
   useEffect(() => {
@@ -72,18 +71,18 @@ const DateRangePicker: React.FC = () => {
     includePreviousMonthDays: boolean = false
   ): Day[] => {
     const days: Day[] = [];
-    const firstDayOfMonth = new Date(year, month, 1);
-    const lastDayOfMonth = new Date(year, month + 1, 0);
-    const lastDayOfPreviousMonth = new Date(year, month, 0);
+    const firstDayOfMonth = new Date(Date.UTC(year, month, 1));
+    const lastDayOfMonth = new Date(Date.UTC(year, month + 1, 0));
+    const lastDayOfPreviousMonth = new Date(Date.UTC(year, month, 0));
 
-    let startingDayIndex = firstDayOfMonth.getDay();
+    let startingDayIndex = firstDayOfMonth.getUTCDay();
 
     if (startingDayIndex === FIRST_DAY_OF_WEEK_INDEX) {
       startingDayIndex = LAST_DAY_OF_WEEK_INDEX;
     }
 
     if (includePreviousMonthDays) {
-      const daysInPreviousMonth = lastDayOfPreviousMonth.getDate();
+      const daysInPreviousMonth = lastDayOfPreviousMonth.getUTCDate();
 
       for (
         let dayIndex =
@@ -95,8 +94,12 @@ const DateRangePicker: React.FC = () => {
       }
     }
 
-    for (let dayIndex = 1; dayIndex <= lastDayOfMonth.getDate(); dayIndex++) {
-      const date = new Date(year, month, dayIndex);
+    for (
+      let dayIndex = 1;
+      dayIndex <= lastDayOfMonth.getUTCDate();
+      dayIndex++
+    ) {
+      const date = new Date(Date.UTC(year, month, dayIndex));
       days.push({ date, dayOfMonth: dayIndex });
     }
 
@@ -233,8 +236,8 @@ const DateRangePicker: React.FC = () => {
   const dateSchema = yup
     .string()
     .matches(
-      /^(0?[1-9]|[12][0-9]|3[01])\s(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s\d{4}$/i,
-      "Date must be in format DD Month YYYY, e.g., 22 May 1987!"
+      /^\d{4}-(0[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01])$/,
+      "Date must be in format DD.MM.YYYY, e.g., 22.05.1987!"
     );
 
   const validateDate = (
@@ -249,22 +252,37 @@ const DateRangePicker: React.FC = () => {
     }
   };
 
+  const isValidDate = (dateStr: string) => {
+    const regex = /^(20[0-9]{2}|2100)-\d{2}-\d{2}$/;
+    if (!dateStr.match(regex)) {
+      return false;
+    }
+
+    const [year, month, day] = dateStr.split("-").map(Number);
+    const date = new Date(year, month - 1, day);
+    const hasCorrectMonth = date.getMonth() + 1 === month;
+    const hasCorrectDay = date.getDate() === day;
+    const hasCorrectYear = date.getFullYear() === year;
+
+    return hasCorrectYear && hasCorrectMonth && hasCorrectDay;
+  };
+
   const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
+    const date = new Date(value);
     setInputStartDate(value);
 
-    if (dateSchema.isValidSync(value)) {
-      const date = new Date(value);
+    if (!isNaN(date.getTime()) && isValidDate(value)) {
       handleDayClick(date);
     }
   };
 
   const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setInputEndDate(e.target.value);
+    const date = new Date(value);
+    setInputEndDate(value);
 
-    if (dateSchema.isValidSync(value)) {
-      const date = new Date(value);
+    if (!isNaN(date.getTime()) && isValidDate(value)) {
       handleDayClick(date);
     }
   };
@@ -289,7 +307,7 @@ const DateRangePicker: React.FC = () => {
           </span>
         )}
         <input
-          type="text"
+          type="date"
           value={inputStartDate}
           placeholder="Start Date"
           className={classes["picked-date__start-day"]}
@@ -303,7 +321,7 @@ const DateRangePicker: React.FC = () => {
           </span>
         )}
         <input
-          type="text"
+          type="date"
           value={inputEndDate}
           placeholder="End Date"
           className={classes["picked-date__end-day"]}
