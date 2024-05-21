@@ -1,30 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
 import { db } from "../firebase";
 import { addDoc, collection } from "firebase/firestore";
 import { useUser } from "../contexts/UserContext";
 import classNames from "classnames";
-import * as yup from "yup";
 
 import Button from "./Button";
-import { useMonthYear } from "../custom/hooks/useMonthYear";
-import { useDateSelection } from "../custom/hooks/useDateSelection";
 import RoundButton from "../custom/components/RoundButton";
 import { months, daysOfWeek } from "../common/constants/constants";
 import { UI_TEXT } from "../common/constants/constants";
 import classes from "../styles/DateRangePicker.module.scss";
+import { useDateRangePicker } from "../custom/hooks/useDateRangePicker";
 
-interface NewTrip {
-  userId: string;
-  startDate: string;
-  endDate: string;
-}
-
-const FIRST_DAY_OF_WEEK_INDEX = 0;
-const LAST_DAY_OF_WEEK_INDEX = 7;
-const OFFSET_TO_MONDAY = 2;
 const TO_PREVIOUS_MONTH = -1;
 const TO_NEXT_MONTH = 1;
+const NEXT_DAY = 1;
+const PREVIOUS_DAY = -1;
+const NEXT_7_DAYS = 7;
+const PREVIOUS_7_DAYS = -7;
 
 interface Day {
   date: Date | null;
@@ -33,88 +26,24 @@ interface Day {
 }
 
 const DateRangePicker: React.FC = () => {
-  const [inputStartDate, setInputStartDate] = useState<string>("");
-  const [inputEndDate, setInputEndDate] = useState<string>("");
-  const [inputDateError, setInputDateError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-
-  const { currentMonth, currentYear, changeMonth, getNextMonthAndYear } =
-    useMonthYear();
-  const {
-    startDate,
-    endDate,
-    selectedDay,
-    handleDayClick,
-    cancelSelectedDates,
-    isCancelled,
-    resetCancellation,
-  } = useDateSelection();
-
-  useEffect(() => {
-    setInputStartDate(startDate ? startDate.toISOString().split("T")[0] : "");
-    setInputEndDate(endDate ? endDate.toISOString().split("T")[0] : "");
-  }, [startDate, endDate]);
-
-  useEffect(() => {
-    if (isCancelled) {
-      setInputStartDate("");
-      setInputEndDate("");
-      setInputDateError(null);
-      setSuccessMessage(null);
-      resetCancellation();
-    }
-  }, [isCancelled]);
-
   const { userId } = useUser();
-
-  const generateDaysInMonth = (
-    year: number,
-    month: number,
-    includePreviousMonthDays: boolean = false
-  ): Day[] => {
-    const days: Day[] = [];
-    const firstDayOfMonth = new Date(Date.UTC(year, month, 1));
-    const lastDayOfMonth = new Date(Date.UTC(year, month + 1, 0));
-    const lastDayOfPreviousMonth = new Date(Date.UTC(year, month, 0));
-
-    let startingDayIndex = firstDayOfMonth.getUTCDay();
-
-    if (startingDayIndex === FIRST_DAY_OF_WEEK_INDEX) {
-      startingDayIndex = LAST_DAY_OF_WEEK_INDEX;
-    }
-
-    if (includePreviousMonthDays) {
-      const daysInPreviousMonth = lastDayOfPreviousMonth.getUTCDate();
-
-      for (
-        let dayIndex =
-          daysInPreviousMonth - startingDayIndex + OFFSET_TO_MONDAY;
-        dayIndex <= daysInPreviousMonth;
-        dayIndex++
-      ) {
-        days.push({ date: null, dayOfMonth: dayIndex });
-      }
-    }
-
-    for (
-      let dayIndex = 1;
-      dayIndex <= lastDayOfMonth.getUTCDate();
-      dayIndex++
-    ) {
-      const date = new Date(Date.UTC(year, month, dayIndex));
-      days.push({ date, dayOfMonth: dayIndex });
-    }
-
-    days.forEach((day) => {
-      if (startDate && endDate && day.date) {
-        day.isInRange = day.date >= startDate && day.date <= endDate;
-      } else {
-        day.isInRange = false;
-      }
-    });
-
-    return days;
-  };
+  const {
+    state,
+    handleStartDateChange,
+    handleEndDateChange,
+    handleStartDateBlur,
+    handleEndDateBlur,
+    cancelSelectedDates,
+    changeMonth,
+    currentMonth,
+    currentYear,
+    getNextMonthAndYear,
+    handleDayClick,
+    generateDaysInMonth,
+    selectedDay,
+    isValidDate,
+    dispatch,
+  } = useDateRangePicker();
 
   const { month: nextMonth, year: nextYear } = getNextMonthAndYear();
 
@@ -138,19 +67,19 @@ const DateRangePicker: React.FC = () => {
             break;
           case "ArrowRight":
             event.preventDefault();
-            moveFocus(adjustedIndex, 1);
+            moveFocus(adjustedIndex, NEXT_DAY);
             break;
           case "ArrowLeft":
             event.preventDefault();
-            moveFocus(adjustedIndex, -1);
+            moveFocus(adjustedIndex, PREVIOUS_DAY);
             break;
           case "ArrowDown":
             event.preventDefault();
-            moveFocus(adjustedIndex, 7);
+            moveFocus(adjustedIndex, NEXT_7_DAYS);
             break;
           case "ArrowUp":
             event.preventDefault();
-            moveFocus(adjustedIndex, -7);
+            moveFocus(adjustedIndex, PREVIOUS_7_DAYS);
             break;
           default:
             break;
@@ -190,14 +119,6 @@ const DateRangePicker: React.FC = () => {
     targetElement?.focus();
   };
 
-  const handlePreviousMonth = () => {
-    changeMonth(TO_PREVIOUS_MONTH);
-  };
-
-  const handleNextMonth = () => {
-    changeMonth(TO_NEXT_MONTH);
-  };
-
   const renderDaysOfWeek = () => {
     return daysOfWeek.map((day) => (
       <div key={day} className={classes["days-of-week__day"]}>
@@ -208,17 +129,18 @@ const DateRangePicker: React.FC = () => {
 
   const handleConfirmDates = async () => {
     try {
-      if (inputStartDate && inputEndDate) {
-        const isValidStartDate = dateSchema.isValidSync(inputStartDate);
-        const isValidEndDate = dateSchema.isValidSync(inputEndDate);
+      if (state.inputStartDate && state.inputEndDate) {
+        const isValidStartDate = isValidDate(state.inputStartDate);
+        const isValidEndDate = isValidDate(state.inputEndDate);
 
         if (!isValidStartDate || !isValidEndDate) {
-          return;
+          throw new Error("Wrong date input");
         }
-        const startDateISO = new Date(inputStartDate).toISOString();
-        const endDateISO = new Date(inputEndDate).toISOString();
 
-        const newTrip: NewTrip = {
+        const startDateISO = new Date(state.inputStartDate).toISOString();
+        const endDateISO = new Date(state.inputEndDate).toISOString();
+
+        const newTrip = {
           userId: userId || "",
           startDate: startDateISO,
           endDate: endDateISO,
@@ -226,76 +148,14 @@ const DateRangePicker: React.FC = () => {
 
         await addDoc(collection(db, "trips"), newTrip);
 
-        setSuccessMessage("New trip successfully submitted!");
         cancelSelectedDates();
-        setInputStartDate("");
-        setInputEndDate("");
       }
     } catch (error: any) {
-      setInputDateError(error.message);
+      dispatch({
+        type: "SET_DATE_ERROR",
+        payload: error.message,
+      });
     }
-  };
-
-  const dateSchema = yup
-    .string()
-    .matches(
-      /^\d{4}-(0[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01])$/,
-      "Date must be in format DD.MM.YYYY, e.g., 22.05.1987!"
-    );
-
-  const validateDate = (
-    date: string,
-    setError: React.Dispatch<React.SetStateAction<string | null>>
-  ) => {
-    try {
-      dateSchema.validateSync(date);
-      setError(null);
-    } catch (error) {
-      setError((error as yup.ValidationError).message);
-    }
-  };
-
-  const isValidDate = (dateStr: string) => {
-    const regex = /^(20[0-9]{2}|2100)-\d{2}-\d{2}$/;
-    if (!dateStr.match(regex)) {
-      return false;
-    }
-
-    const [year, month, day] = dateStr.split("-").map(Number);
-    const date = new Date(year, month - 1, day);
-    const hasCorrectMonth = date.getMonth() + 1 === month;
-    const hasCorrectDay = date.getDate() === day;
-    const hasCorrectYear = date.getFullYear() === year;
-
-    return hasCorrectYear && hasCorrectMonth && hasCorrectDay;
-  };
-
-  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    const date = new Date(value);
-    setInputStartDate(value);
-
-    if (!isNaN(date.getTime()) && isValidDate(value)) {
-      handleDayClick(date);
-    }
-  };
-
-  const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    const date = new Date(value);
-    setInputEndDate(value);
-
-    if (!isNaN(date.getTime()) && isValidDate(value)) {
-      handleDayClick(date);
-    }
-  };
-
-  const handleStartDateBlur = () => {
-    validateDate(inputStartDate, setInputDateError);
-  };
-
-  const handleEndDateBlur = () => {
-    validateDate(inputEndDate, setInputDateError);
   };
 
   const currentMonthDays = generateDaysInMonth(currentYear, currentMonth, true);
@@ -304,28 +164,28 @@ const DateRangePicker: React.FC = () => {
   return (
     <div className={classes["date-range"]}>
       <div className={classes["picked-date"]}>
-        {inputStartDate && (
+        {state.inputStartDate && (
           <span className={classes["picked-date__start-day--span"]}>
             start date
           </span>
         )}
         <input
           type="date"
-          value={inputStartDate}
+          value={state.inputStartDate}
           placeholder="Start Date"
           className={classes["picked-date__start-day"]}
           onChange={handleStartDateChange}
           onBlur={handleStartDateBlur}
         />
 
-        {inputEndDate && (
+        {state.inputEndDate && (
           <span className={classes["picked-date__end-day--span"]}>
             end date
           </span>
         )}
         <input
           type="date"
-          value={inputEndDate}
+          value={state.inputEndDate}
           placeholder="End Date"
           className={classes["picked-date__end-day"]}
           onChange={handleEndDateChange}
@@ -333,10 +193,7 @@ const DateRangePicker: React.FC = () => {
         />
       </div>
       <div className={classes["input-error"]}>
-        {(inputDateError && <span>{inputDateError}</span>) ||
-          (successMessage && (
-            <span className={classes["success-message"]}>{successMessage}</span>
-          ))}
+        {state.inputDateError && <span>{state.inputDateError}</span>}
       </div>
       <div className={classes["btn-action"]}>
         <div className={classes["btn-container"]}>
@@ -354,7 +211,7 @@ const DateRangePicker: React.FC = () => {
         <div>
           <div className={classes["date-range__current-month"]}>
             <RoundButton
-              onButtonClick={handlePreviousMonth}
+              onButtonClick={() => changeMonth(TO_PREVIOUS_MONTH)}
               icon={faAngleLeft}
               ariaLabel="Go to previous month"
               className={classes.left}
@@ -370,7 +227,7 @@ const DateRangePicker: React.FC = () => {
           <div className={classes["date-range__next-month"]}>
             {`${months[nextMonth]} ${nextYear}`}
             <RoundButton
-              onButtonClick={handleNextMonth}
+              onButtonClick={() => changeMonth(TO_NEXT_MONTH)}
               icon={faAngleRight}
               ariaLabel="Go to next month"
               className={classes.right}
