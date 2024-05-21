@@ -212,7 +212,6 @@
 
 .btn-container {
   @include flex-center(column);
-  margin-right: $spacing-m;
 }
 
 .btn-action {
@@ -220,8 +219,18 @@
   margin-bottom: $spacing-lg;
 }
 
+.btn-action .btn-container:first-child {
+  margin-right: 10px;
+}
+
 .input-error {
   @include typography-sm;
   color: $error-color;
   margin-bottom: $spacing-sm;
+}
+
+.success-message {
+  @include typography-sm-2;
+  color: $green-light-1;
+  margin-bottom: $spacing-m;
 }

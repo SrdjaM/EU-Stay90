@@ -36,6 +36,7 @@ const DateRangePicker: React.FC = () => {
   const [inputStartDate, setInputStartDate] = useState<string>("");
   const [inputEndDate, setInputEndDate] = useState<string>("");
   const [inputDateError, setInputDateError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const { currentMonth, currentYear, changeMonth, getNextMonthAndYear } =
     useMonthYear();
@@ -59,6 +60,7 @@ const DateRangePicker: React.FC = () => {
       setInputStartDate("");
       setInputEndDate("");
       setInputDateError(null);
+      setSuccessMessage(null);
       resetCancellation();
     }
   }, [isCancelled]);
@@ -224,6 +226,7 @@ const DateRangePicker: React.FC = () => {
 
         await addDoc(collection(db, "trips"), newTrip);
 
+        setSuccessMessage("New trip successfully submitted!");
         cancelSelectedDates();
         setInputStartDate("");
         setInputEndDate("");
@@ -330,7 +333,10 @@ const DateRangePicker: React.FC = () => {
         />
       </div>
       <div className={classes["input-error"]}>
-        {inputDateError && <span>{inputDateError}</span>}
+        {(inputDateError && <span>{inputDateError}</span>) ||
+          (successMessage && (
+            <span className={classes["success-message"]}>{successMessage}</span>
+          ))}
       </div>
       <div className={classes["btn-action"]}>
         <div className={classes["btn-container"]}>
