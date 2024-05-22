@@ -12,6 +12,7 @@ import RoundButton from "../custom/components/RoundButton";
 import { formatDate } from "../custom/utils/dateUtils";
 import { months, daysOfWeek } from "../common/constants/constants";
 import { UI_TEXT } from "../common/constants/constants";
+import { useToast } from "../contexts/ToastContext";
 import classes from "../styles/DateRangePicker.module.scss";
 
 interface NewTrip {
@@ -42,6 +43,7 @@ const DateRangePicker: React.FC = () => {
     handleDayClick,
     cancelSelectedDates,
   } = useDateSelection();
+  const addToast = useToast();
 
   const { userId } = useUser();
 
@@ -193,11 +195,14 @@ const DateRangePicker: React.FC = () => {
         };
 
         await addDoc(collection(db, "trips"), newTrip);
+        // throw new Error();
+
+        addToast("Trip added successfully!", "success");
 
         cancelSelectedDates();
       }
     } catch (error) {
-      console.error("Error adding trip:", error);
+      addToast("Failed to add trip.", "error");
     }
   };
 
