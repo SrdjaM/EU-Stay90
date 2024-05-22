@@ -201,7 +201,11 @@ const DateRangePicker: React.FC = () => {
         cancelSelectedDates();
       }
     } catch (error) {
-      addToast("Failed to add trip.", "error");
+      if (error instanceof Error) {
+        addToast(`Failed to add trip: ${error.message}`, "error");
+      } else {
+        addToast("Failed to add trip due to an unknown error.", "error");
+      }
     }
   };
 

@@ -35,7 +35,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
       setToasts((currentToasts) =>
         currentToasts.filter((toast) => toast.id !== id)
       );
-    }, 3500);
+    }, 3300);
   };
 
   const removeToast = (id: string) => {
