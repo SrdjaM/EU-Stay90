@@ -3,6 +3,7 @@
 
 .toast {
   position: fixed;
+  min-width: 11rem;
   top: $spacing-m;
   right: $spacing-m;
   color: $white-color;
@@ -10,7 +11,7 @@
   border-radius: $border-radius-xs;
   box-shadow: $box-shadow-light;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   animation: fadeIn 0.5s, fadeOut 0.5s 3s;
   z-index: 1000;
@@ -23,6 +24,7 @@
 
 .toast.error {
   background-color: $error-color;
+  border: 2px solid $error-color;
 }
 
 .closeButton {

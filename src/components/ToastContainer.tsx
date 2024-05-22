@@ -1,45 +1,21 @@
-import React, {
-  useState,
-  useCallback,
-  forwardRef,
-  useImperativeHandle,
-} from "react";
-import { v4 as uuidv4 } from "uuid";
+import React from "react";
 import BasicToast from "./BasicToast";
 
 interface Toast {
   id: string;
-  message: string;
   type: "success" | "error" | "info" | "warning";
+  message: string;
 }
 
-export interface ToastContainerRef {
-  addToast: (
-    message: string,
-    type: "success" | "error" | "info" | "warning"
-  ) => void;
+interface ToastContainerProps {
+  toasts: Toast[];
+  removeToast: (id: string) => void;
 }
 
-const ToastContainer = forwardRef<ToastContainerRef>((props, ref) => {
-  const [toasts, setToasts] = useState<Toast[]>([]);
-
-  const addToast = useCallback(
-    (message: string, type: "success" | "error" | "info" | "warning") => {
-      const id = uuidv4();
-      setToasts((prevToasts) => [...prevToasts, { id, message, type }]);
-      setTimeout(() => {
-        setToasts((currentToasts) =>
-          currentToasts.filter((toast) => toast.id !== id)
-        );
-      }, 3500);
-    },
-    []
-  );
-
-  useImperativeHandle(ref, () => ({
-    addToast,
-  }));
-
+const ToastContainer: React.FC<ToastContainerProps> = ({
+  toasts,
+  removeToast,
+}) => {
   return (
     <div>
       {toasts.map((toast) => (
@@ -47,15 +23,11 @@ const ToastContainer = forwardRef<ToastContainerRef>((props, ref) => {
           key={toast.id}
           message={toast.message}
           type={toast.type}
-          onClose={() =>
-            setToasts((currentToasts) =>
-              currentToasts.filter((t) => t.id !== toast.id)
-            )
-          }
+          onClose={() => removeToast(toast.id)}
         />
       ))}
     </div>
   );
-});
+};
 
 export default ToastContainer;

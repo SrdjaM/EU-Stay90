@@ -195,7 +195,6 @@ const DateRangePicker: React.FC = () => {
         };
 
         await addDoc(collection(db, "trips"), newTrip);
-        // throw new Error();
 
         addToast("Trip added successfully!", "success");
 
