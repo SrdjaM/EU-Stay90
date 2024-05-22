@@ -55,7 +55,7 @@ const AuthForm: React.FC = () => {
     const { name, value } = e.target;
     dispatch({
       type: ActionTypes.SET_TOUCHED,
-      payload: { ...state.touched, [name]: true },
+      payload: { [name]: true },
     });
     validateField(name, value);
   };
