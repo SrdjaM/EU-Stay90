@@ -6,6 +6,7 @@ export const initialState: AuthFormState = {
   errors: [],
   errorMessage: null,
   isSuccess: false,
+  touched: {},
 };
 
 export const reducer = (
@@ -21,6 +22,8 @@ export const reducer = (
       return { ...state, errorMessage: action.payload };
     case ActionTypes.SET_IS_SUCCESS:
       return { ...state, isSuccess: action.payload };
+    case ActionTypes.SET_TOUCHED:
+      return { ...state, touched: { ...state.touched, ...action.payload } };
     default:
       return state;
   }
