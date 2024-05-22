@@ -1,20 +1,28 @@
 @import "_variables";
 @import "colors";
+@import "breakpoints";
 
 .toast {
   position: fixed;
-  min-width: 11rem;
+  width: 17rem;
   top: $spacing-m;
   right: $spacing-m;
   color: $white-color;
-  padding: $spacing-ml $spacing-lg;
+  padding: $spacing-ml $spacing-lg $spacing-ml $spacing-m;
   border-radius: $border-radius-xs;
   box-shadow: $box-shadow-light;
+  box-sizing: border-box;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   animation: fadeIn 0.5s, fadeOut 0.5s 3s;
   z-index: 1000;
+
+  @include breakpoint-sm-and-lower {
+    width: 100vw;
+    top: 0;
+    right: 0;
+  }
 }
 
 .toast.success {
@@ -39,6 +47,10 @@
   position: absolute;
   top: 0.2rem;
   right: 0.2rem;
+}
+
+.icon {
+  margin-right: $spacing-sm;
 }
 
 @keyframes fadeIn {
