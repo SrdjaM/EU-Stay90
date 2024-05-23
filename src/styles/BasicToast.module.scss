@@ -15,7 +15,8 @@
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  animation: fadeIn 0.5s, fadeOut 0.5s 3s;
+  animation: fadeIn 0.5s, fadeOut 0.5s 4s;
+  animation-fill-mode: forwards;
   z-index: 1000;
 
   @include breakpoint-sm-and-lower {
