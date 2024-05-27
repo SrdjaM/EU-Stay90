@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  onSnapshot,
+  query,
+  where,
+  doc,
+} from "firebase/firestore";
 import { db } from "../firebase";
 import { useUser } from "../contexts/UserContext";
+import { faEdit, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { formatDate } from "../custom/utils/dateUtils";
 import classes from "../styles/TripList.module.scss";
@@ -11,6 +20,7 @@ import Loader from "./Loader";
 const DAYS_AVAILABLE_IN_EU = 90;
 
 export interface Trip {
+  id: string;
   startDate: Date;
   endDate: Date;
 }
@@ -59,6 +69,17 @@ const TripList: React.FC = () => {
             {formatDate(trip.endDate, months)}
           </span>
         </div>
+        <div className={classes["edit-delete_container"]}>
+          <div className={classes["edit_container"]} onClick={handleEditTrip}>
+            <FontAwesomeIcon icon={faEdit} />
+          </div>
+          <div className={classes["delete_container"]}>
+            <FontAwesomeIcon
+              icon={faTrashAlt}
+              onClick={() => handleDeleteTrip(trip.id)}
+            />
+          </div>
+        </div>
       </li>
     ));
   };
@@ -87,6 +108,7 @@ const TripList: React.FC = () => {
         querySnapshot.forEach((doc) => {
           const tripData = doc.data();
           tripsData.push({
+            id: doc.id,
             startDate: new Date(tripData.startDate),
             endDate: new Date(tripData.endDate),
           });
@@ -139,6 +161,20 @@ const TripList: React.FC = () => {
       </div>
     );
   };
+
+  const handleEditTrip = () => {};
+
+  const handleDeleteTrip = async (tripId: string) => {
+    try {
+      await deleteDoc(doc(db, "trips", tripId));
+
+      //TODO: set success message in toast notification
+    } catch (error) {
+      //TODO: set error message in toast notification
+    }
+  };
+
+  console.log(trips);
 
   return (
     <div className={classes["trip-list__count"]}>

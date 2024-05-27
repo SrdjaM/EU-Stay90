@@ -116,6 +116,7 @@
 
 .trip__list {
   list-style: none;
+  display: flex;
 }
 
 .trip__container {
@@ -127,6 +128,7 @@
   margin-bottom: $spacing-xs;
   color: $black-color;
   font-weight: $bold-fontweight;
+  width: 100%;
 
   @include breakpoint-md-and-lower {
     font-size: $font-sm;
@@ -168,4 +170,25 @@
     min-width: none;
     text-align: start;
   }
+}
+
+.edit-delete_container {
+  @include boxStyle();
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-xs;
+  border-left: none;
+}
+
+.edit_container,
+.delete_container {
+  cursor: pointer;
+}
+
+.edit_container {
+  margin-right: $spacing-sm;
+}
+
+.delete_container {
+  color: $error-color;
 }
