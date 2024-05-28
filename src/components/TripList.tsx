@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import {
   collection,
   deleteDoc,
+  doc,
   onSnapshot,
   query,
   where,
-  doc,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { useUser } from "../contexts/UserContext";
@@ -16,6 +16,7 @@ import { formatDate } from "../custom/utils/dateUtils";
 import classes from "../styles/TripList.module.scss";
 import { months } from "../common/constants/constants";
 import Loader from "./Loader";
+import EditTripModal from "./EditTripModal";
 
 const DAYS_AVAILABLE_IN_EU = 90;
 
@@ -28,6 +29,7 @@ export interface Trip {
 const TripList: React.FC = () => {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editTripId, setEditTripId] = useState<string | null>(null);
   const { userId } = useUser();
 
   const countDays = (trip: Trip) => {
@@ -70,14 +72,21 @@ const TripList: React.FC = () => {
           </span>
         </div>
         <div className={classes["edit-delete_container"]}>
-          <div className={classes["edit_container"]} onClick={handleEditTrip}>
+          <div
+            className={classes["edit_container"]}
+            onClick={() => setEditTripId(trip.id)}
+            tabIndex={0}
+            onKeyDown={(e) => e.key === "Enter" && setEditTripId(trip.id)}
+          >
             <FontAwesomeIcon icon={faEdit} />
           </div>
-          <div className={classes["delete_container"]}>
-            <FontAwesomeIcon
-              icon={faTrashAlt}
-              onClick={() => handleDeleteTrip(trip.id)}
-            />
+          <div
+            className={classes["delete_container"]}
+            onClick={() => handleDeleteTrip(trip.id)}
+            tabIndex={0}
+            onKeyDown={(e) => e.key === "Enter" && handleDeleteTrip(trip.id)}
+          >
+            <FontAwesomeIcon icon={faTrashAlt} />
           </div>
         </div>
       </li>
@@ -120,6 +129,7 @@ const TripList: React.FC = () => {
       },
       (error) => {
         console.error("Error listening to trips updates:", error);
+        // TODO: set error message in toast notification
         setLoading(false);
       }
     );
@@ -162,19 +172,18 @@ const TripList: React.FC = () => {
     );
   };
 
-  const handleEditTrip = () => {};
-
   const handleDeleteTrip = async (tripId: string) => {
     try {
       await deleteDoc(doc(db, "trips", tripId));
-
-      //TODO: set success message in toast notification
+      // TODO: set success message in toast notification
     } catch (error) {
-      //TODO: set error message in toast notification
+      // TODO: set error message in toast notification
     }
   };
 
-  console.log(trips);
+  const handleEditModalClose = () => {
+    setEditTripId(null);
+  };
 
   return (
     <div className={classes["trip-list__count"]}>
@@ -201,6 +210,13 @@ const TripList: React.FC = () => {
         Your trips in last 180 days
       </h3>
       <div className={classes["trip-list__container"]}>{renderTripList()}</div>
+      {editTripId && (
+        <EditTripModal
+          trip={trips.find((trip) => trip.id === editTripId) as Trip}
+          tripId={editTripId}
+          onClose={handleEditModalClose}
+        />
+      )}
     </div>
   );
 };
