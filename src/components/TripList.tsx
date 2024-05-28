@@ -10,13 +10,13 @@ import {
 import { db } from "../firebase";
 import { useUser } from "../contexts/UserContext";
 import { faEdit, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { formatDate } from "../custom/utils/dateUtils";
 import classes from "../styles/TripList.module.scss";
 import { months } from "../common/constants/constants";
 import Loader from "./Loader";
 import EditTripModal from "./EditTripModal";
+import DropdownMenu from "../custom/components/DropdownMenu";
 
 const DAYS_AVAILABLE_IN_EU = 90;
 
@@ -56,6 +56,19 @@ const TripList: React.FC = () => {
     return last180DaysTrips.reduce((total, trip) => total + countDays(trip), 0);
   };
 
+  const getDropdownItems = (tripId: string) => [
+    {
+      icon: faEdit,
+      text: "Edit",
+      action: () => setEditTripId(tripId),
+    },
+    {
+      icon: faTrashAlt,
+      text: "Delete",
+      action: () => handleDeleteTrip(tripId),
+    },
+  ];
+
   const listItems = () => {
     const last180DaysTrips = filterTripsLast180Days();
     return last180DaysTrips.map((trip, index) => (
@@ -70,23 +83,8 @@ const TripList: React.FC = () => {
           <span className={classes["trip_end-date"]}>
             {formatDate(trip.endDate, months)}
           </span>
-        </div>
-        <div className={classes["edit-delete_container"]}>
-          <div
-            className={classes["edit_container"]}
-            onClick={() => setEditTripId(trip.id)}
-            tabIndex={0}
-            onKeyDown={(e) => e.key === "Enter" && setEditTripId(trip.id)}
-          >
-            <FontAwesomeIcon icon={faEdit} />
-          </div>
-          <div
-            className={classes["delete_container"]}
-            onClick={() => handleDeleteTrip(trip.id)}
-            tabIndex={0}
-            onKeyDown={(e) => e.key === "Enter" && handleDeleteTrip(trip.id)}
-          >
-            <FontAwesomeIcon icon={faTrashAlt} />
+          <div className={classes["edit-delete_container"]}>
+            <DropdownMenu items={getDropdownItems(trip.id)} />
           </div>
         </div>
       </li>

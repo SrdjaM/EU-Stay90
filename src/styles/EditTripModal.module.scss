@@ -14,12 +14,17 @@
   @include flex-center();
 }
 
-.modalContent {
+.modal_content {
   background-color: $white-color;
   padding: $spacing-m;
   border-radius: $border-radius-s;
   text-align: center;
-  min-width: 18.75rem;
+  min-width: 18rem;
+
+  @include breakpoint-sm-and-lower {
+    padding: $spacing-sm;
+    min-width: 15rem;
+  }
 }
 
 label {

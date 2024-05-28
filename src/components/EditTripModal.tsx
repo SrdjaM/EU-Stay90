@@ -58,7 +58,7 @@ const EditTripModal: React.FC<EditTripModalProps> = ({
 
   return (
     <div className={classes.modal}>
-      <div className={classes.modalContent}>
+      <div className={classes["modal_content"]}>
         <h2>Edit Trip</h2>
         <label>
           Start Date:
