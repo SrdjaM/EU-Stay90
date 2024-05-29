@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useReducer } from "react";
 import {
   collection,
   deleteDoc,
@@ -17,6 +17,8 @@ import { months } from "../common/constants/constants";
 import Loader from "./Loader";
 import EditTripModal from "./EditTripModal";
 import DropdownMenu from "../custom/components/DropdownMenu";
+import { TripListActionTypes } from "../common/enums/ActionTypes";
+import { initialState, reducer } from "../common/hooks/tripListReducer";
 
 const DAYS_AVAILABLE_IN_EU = 90;
 
@@ -27,10 +29,7 @@ export interface Trip {
 }
 
 const TripList: React.FC = () => {
-  const [trips, setTrips] = useState<Trip[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [editTripId, setEditTripId] = useState<string | null>(null);
-  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   const { userId } = useUser();
 
@@ -41,13 +40,13 @@ const TripList: React.FC = () => {
   };
 
   const filterTripsLast180Days = () => {
-    if (trips.length === 0) return [];
+    if (state.trips.length === 0) return [];
 
-    const lastTrip = trips[0];
+    const lastTrip = state.trips[0];
     const last180DaysDate = new Date(lastTrip.endDate);
     last180DaysDate.setDate(lastTrip.endDate.getDate() - 180);
 
-    return trips.filter(
+    return state.trips.filter(
       (trip) =>
         trip.startDate >= last180DaysDate && trip.endDate <= lastTrip.endDate
     );
@@ -62,7 +61,11 @@ const TripList: React.FC = () => {
     {
       icon: faEdit,
       text: "Edit",
-      action: () => setEditTripId(tripId),
+      action: () =>
+        dispatch({
+          type: TripListActionTypes.SET_EDIT_TRIP_ID,
+          payload: tripId,
+        }),
     },
     {
       icon: faTrashAlt,
@@ -71,10 +74,13 @@ const TripList: React.FC = () => {
     },
   ];
 
-  const isDropdownOpened = (tripId: string) => openDropdownId === tripId;
+  const isDropdownOpened = (tripId: string) => state.openDropdownId === tripId;
 
   const toggleDropdown = (tripId: string) => {
-    setOpenDropdownId(openDropdownId === tripId ? null : tripId);
+    dispatch({
+      type: TripListActionTypes.SET_OPEN_DROPDOWN_ID,
+      payload: state.openDropdownId === tripId ? null : tripId,
+    });
   };
 
   const listItems = () => {
@@ -118,7 +124,7 @@ const TripList: React.FC = () => {
   };
 
   useEffect(() => {
-    setLoading(true);
+    dispatch({ type: TripListActionTypes.SET_LOADING, payload: true });
     const q = query(collection(db, "trips"), where("userId", "==", userId));
     const unsubscribe = onSnapshot(
       q,
@@ -134,22 +140,22 @@ const TripList: React.FC = () => {
         });
         tripsData.sort((a, b) => b.startDate.getTime() - a.startDate.getTime());
 
-        setTrips(tripsData);
-        setLoading(false);
+        dispatch({ type: TripListActionTypes.SET_TRIPS, payload: tripsData });
+        dispatch({ type: TripListActionTypes.SET_LOADING, payload: false });
       },
       (error) => {
         console.error("Error listening to trips updates:", error);
         // TODO: set error message in toast notification
-        setLoading(false);
+        dispatch({ type: TripListActionTypes.SET_LOADING, payload: false });
       }
     );
     return () => unsubscribe();
   }, [userId]);
 
   const renderTripList = () => {
-    if (loading) {
-      return <Loader loading={loading} />;
-    } else if (trips.length > 0) {
+    if (state.loading) {
+      return <Loader loading={state.loading} />;
+    } else if (state.trips.length > 0) {
       return <ul className={classes["trip-list__list"]}>{listItems()}</ul>;
     } else {
       return (
@@ -161,9 +167,9 @@ const TripList: React.FC = () => {
   };
 
   const getNextFull90Days = () => {
-    if (trips.length === 0) return new Date();
+    if (state.trips.length === 0) return new Date();
 
-    const lastTrip = trips[0];
+    const lastTrip = state.trips[0];
     const resetDate = new Date(lastTrip.endDate);
     resetDate.setDate(resetDate.getDate() + 180);
 
@@ -192,7 +198,7 @@ const TripList: React.FC = () => {
   };
 
   const handleEditModalClose = () => {
-    setEditTripId(null);
+    dispatch({ type: TripListActionTypes.SET_EDIT_TRIP_ID, payload: null });
   };
 
   return (
@@ -220,10 +226,12 @@ const TripList: React.FC = () => {
         Your trips in last 180 days
       </h3>
       <div className={classes["trip-list__container"]}>{renderTripList()}</div>
-      {editTripId && (
+      {state.editTripId && (
         <EditTripModal
-          trip={trips.find((trip) => trip.id === editTripId) as Trip}
-          tripId={editTripId}
+          trip={
+            state.trips.find((trip) => trip.id === state.editTripId) as Trip
+          }
+          tripId={state.editTripId}
           onClose={handleEditModalClose}
         />
       )}
