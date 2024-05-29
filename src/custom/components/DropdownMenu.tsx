@@ -12,15 +12,15 @@ interface DropdownMenuItem {
 
 interface DropdownMenuProps {
   items: DropdownMenuItem[];
+  isOpen: boolean;
+  onToggle: () => void;
 }
 
-const DropdownMenu: React.FC<DropdownMenuProps> = ({ items }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
-  };
-
+const DropdownMenu: React.FC<DropdownMenuProps> = ({
+  items,
+  isOpen,
+  onToggle,
+}) => {
   const handleKeyDown = (
     e: KeyboardEvent<HTMLDivElement>,
     action: () => void
@@ -34,9 +34,9 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({ items }) => {
     <div className={classes["dropdown_container"]}>
       <div
         className={classes["dropdown_toggle"]}
-        onClick={toggleMenu}
+        onClick={onToggle}
         tabIndex={0}
-        onKeyDown={(e) => handleKeyDown(e, toggleMenu)}
+        onKeyDown={(e) => handleKeyDown(e, onToggle)}
       >
         <FontAwesomeIcon icon={faEllipsisV} />
       </div>

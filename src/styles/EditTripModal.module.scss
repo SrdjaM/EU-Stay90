@@ -27,14 +27,27 @@
   }
 }
 
-label {
+.modal_heading {
+  color: $gray-dark--1;
+  text-transform: uppercase;
+}
+
+.edit-input_label {
   display: block;
   margin-bottom: $spacing-sm;
+  color: $gray-light--1;
+  text-transform: uppercase;
+  @include typography-sm-2;
 }
 
 .edit-input {
   display: block;
   margin: $spacing-sm auto $spacing-ml auto;
+  padding: $spacing-sm;
+  border: $thick-border--light;
+  border-radius: $border-radius-xs;
+  color: $gray-light--1;
+  font-weight: $bold-fontweight;
   &::-webkit-inner-spin-button {
     display: none;
   }

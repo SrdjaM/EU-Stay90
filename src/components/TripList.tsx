@@ -30,6 +30,8 @@ const TripList: React.FC = () => {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
   const [editTripId, setEditTripId] = useState<string | null>(null);
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+
   const { userId } = useUser();
 
   const countDays = (trip: Trip) => {
@@ -69,6 +71,12 @@ const TripList: React.FC = () => {
     },
   ];
 
+  const isDropdownOpened = (tripId: string) => openDropdownId === tripId;
+
+  const toggleDropdown = (tripId: string) => {
+    setOpenDropdownId(openDropdownId === tripId ? null : tripId);
+  };
+
   const listItems = () => {
     const last180DaysTrips = filterTripsLast180Days();
     return last180DaysTrips.map((trip, index) => (
@@ -84,7 +92,11 @@ const TripList: React.FC = () => {
             {formatDate(trip.endDate, months)}
           </span>
           <div className={classes["edit-delete_container"]}>
-            <DropdownMenu items={getDropdownItems(trip.id)} />
+            <DropdownMenu
+              items={getDropdownItems(trip.id)}
+              isOpen={isDropdownOpened(trip.id)}
+              onToggle={() => toggleDropdown(trip.id)}
+            />
           </div>
         </div>
       </li>

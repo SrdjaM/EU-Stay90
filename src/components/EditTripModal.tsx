@@ -59,9 +59,9 @@ const EditTripModal: React.FC<EditTripModalProps> = ({
   return (
     <div className={classes.modal}>
       <div className={classes["modal_content"]}>
-        <h2>Edit Trip</h2>
-        <label>
-          Start Date:
+        <h2 className={classes["modal_heading"]}>Edit Trip</h2>
+        <label className={classes["edit-input_label"]}>
+          Start Date
           <input
             className={classes["edit-input"]}
             type="date"
@@ -69,8 +69,8 @@ const EditTripModal: React.FC<EditTripModalProps> = ({
             onChange={(e) => setStartDate(e.target.value)}
           />
         </label>
-        <label>
-          End Date:
+        <label className={classes["edit-input_label"]}>
+          End Date
           <input
             className={classes["edit-input"]}
             type="date"

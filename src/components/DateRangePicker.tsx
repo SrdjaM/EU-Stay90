@@ -197,6 +197,7 @@ const DateRangePicker: React.FC = () => {
         cancelSelectedDates();
       }
     } catch (error) {
+      //TODO: set error message in toast notification
       console.error("Error adding trip:", error);
     }
   };
