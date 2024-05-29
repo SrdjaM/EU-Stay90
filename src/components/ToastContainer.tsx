@@ -1,5 +1,7 @@
 import React from "react";
+
 import BasicToast from "./BasicToast";
+import classes from "../styles/BasicToast.module.scss";
 
 interface Toast {
   id: string;
@@ -17,7 +19,7 @@ const ToastContainer: React.FC<ToastContainerProps> = ({
   removeToast,
 }) => {
   return (
-    <div>
+    <div className={classes["toast_container"]}>
       {toasts.map((toast) => (
         <BasicToast
           key={toast.id}

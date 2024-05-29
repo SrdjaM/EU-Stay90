@@ -1,5 +1,4 @@
 import React, { createContext, useContext, ReactNode, useState } from "react";
-import { v4 as uuid4 } from "uuid";
 
 import ToastContainer from "../components/ToastContainer";
 
@@ -29,7 +28,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
     message: string,
     type: "success" | "error" | "info" | "warning"
   ) => {
-    const id = uuid4();
+    const id = Date.now().toString();
     setToasts((prevToasts) => [...prevToasts, { id, message, type }]);
     setTimeout(() => {
       setToasts((currentToasts) =>
