@@ -32,7 +32,7 @@ const BasicToast: React.FC<BasicToastProps> = ({ message, type, onClose }) => {
     <div className={classNames(classes.toast, classes[type])}>
       <FontAwesomeIcon icon={iconMap[type]} className={classes.icon} />
       <span>{message}</span>
-      <button onClick={onClose} className={classes.closeButton}>
+      <button onClick={onClose} className={classes["close_button"]}>
         <FontAwesomeIcon icon={faX} />
       </button>
     </div>

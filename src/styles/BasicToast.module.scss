@@ -28,60 +28,49 @@
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  animation: fadeIn 0.5s, fadeOut 0.5s 4s;
+  animation: fadeIn 0.5s, fadeIn 0.5s 4s reverse;
   animation-fill-mode: forwards;
 
   @include breakpoint-sm-and-lower {
     width: 100vw;
   }
+}
 
-  &.success {
-    background-color: $success-color;
-    border: 2px solid $success-color;
+.toast.success {
+  background-color: $success-color;
+  border: 2px solid $success-color;
+}
+
+.toast.error {
+  background-color: $error-color;
+  border: 2px solid $error-color;
+}
+
+.toast .close_button {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: $border-radius-xs;
+  backdrop-filter: blur(0.4rem);
+  -webkit-backdrop-filter: blur(0.4rem);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: $white-color;
+  font-size: $font-sm;
+  cursor: pointer;
+  position: absolute;
+  top: 0.2rem;
+  right: 0.2rem;
+}
+
+.toast .icon {
+  margin-right: $spacing-sm;
+}
+
+@keyframes fadeIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
   }
-
-  &.error {
-    background-color: $error-color;
-    border: 2px solid $error-color;
-  }
-
-  .closeButton {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: $border-radius-xs;
-    backdrop-filter: blur(0.4rem);
-    -webkit-backdrop-filter: blur(0.4rem);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: $white-color;
-    font-size: $font-sm;
-    cursor: pointer;
-    position: absolute;
-    top: 0.2rem;
-    right: 0.2rem;
-  }
-
-  .icon {
-    margin-right: $spacing-sm;
-  }
-
-  @keyframes fadeIn {
-    from {
-      transform: translateX(100%);
-      opacity: 0;
-    }
-    to {
-      transform: translateX(0);
-      opacity: 1;
-    }
-  }
-
-  @keyframes fadeOut {
-    from {
-      transform: translate(0);
-      opacity: 1;
-    }
-    to {
-      transform: translateX(100%);
-      opacity: 0;
-    }
+  to {
+    transform: translateX(0);
+    opacity: 1;
   }
 }
