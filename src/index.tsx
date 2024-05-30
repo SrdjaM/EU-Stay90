@@ -5,6 +5,7 @@ import App from "./App";
 import { AuthProvider } from "./contexts/AuthContext";
 import { UserProvider } from "./contexts/UserContext";
 import { BrowserRouter } from "react-router-dom";
+import { ToastProvider } from "./contexts/ToastContext";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -14,8 +15,10 @@ root.render(
     <BrowserRouter>
       <AuthProvider>
         <UserProvider>
-          <App />
-       </UserProvider>
+          <ToastProvider>
+            <App />
+          </ToastProvider>
+        </UserProvider>
       </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>
