@@ -45,17 +45,9 @@ export function useDateSelection() {
     });
   };
 
-  const resetCancellation = () => {
-    setSelection((prevState) => ({
-      ...prevState,
-      isCancelled: false,
-    }));
-  };
-
   return {
     ...selection,
     handleDayClick,
     cancelSelectedDates,
-    resetCancellation,
   };
 }

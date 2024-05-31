@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
 import { db } from "../firebase";
 import { addDoc, collection } from "firebase/firestore";
@@ -29,6 +29,9 @@ interface Day {
 const DateRangePicker: React.FC = () => {
   const addToast = useToast();
 
+  const startDateRef = useRef<HTMLInputElement>(null);
+  const endDateRef = useRef<HTMLInputElement>(null);
+
   const { userId } = useUser();
   const {
     state,
@@ -45,7 +48,6 @@ const DateRangePicker: React.FC = () => {
     generateDaysInMonth,
     selectedDay,
     isValidDate,
-    dispatch,
   } = useDateRangePicker();
 
   const { month: nextMonth, year: nextYear } = getNextMonthAndYear();
@@ -167,6 +169,12 @@ const DateRangePicker: React.FC = () => {
   const currentMonthDays = generateDaysInMonth(currentYear, currentMonth, true);
   const nextMonthDays = generateDaysInMonth(nextYear, nextMonth, true);
 
+  const handleCancelDates = () => {
+    cancelSelectedDates();
+    if (startDateRef.current) startDateRef.current.value = "";
+    if (endDateRef.current) endDateRef.current.value = "";
+  };
+
   return (
     <div className={classes["date-range"]}>
       <div className={classes["picked-date"]}>
@@ -178,6 +186,7 @@ const DateRangePicker: React.FC = () => {
         <input
           type="date"
           value={state.inputStartDate}
+          ref={startDateRef}
           placeholder="Start Date"
           className={classes["picked-date__start-day"]}
           onChange={handleStartDateChange}
@@ -192,6 +201,7 @@ const DateRangePicker: React.FC = () => {
         <input
           type="date"
           value={state.inputEndDate}
+          ref={endDateRef}
           placeholder="End Date"
           className={classes["picked-date__end-day"]}
           onChange={handleEndDateChange}
@@ -208,7 +218,7 @@ const DateRangePicker: React.FC = () => {
           </Button>
         </div>
         <div className={classes["btn-container"]}>
-          <Button onClick={cancelSelectedDates} variant="primary">
+          <Button onClick={handleCancelDates} variant="primary">
             {UI_TEXT.CANCEL}
           </Button>
         </div>

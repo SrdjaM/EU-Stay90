@@ -1,7 +1,9 @@
 import { useEffect, useReducer } from "react";
+import * as yup from "yup";
+
 import { useMonthYear } from "./useMonthYear";
 import { useDateSelection } from "./useDateSelection";
-import * as yup from "yup";
+import { useToast } from "../../contexts/ToastContext";
 
 const FIRST_DAY_OF_WEEK_INDEX = 0;
 const LAST_DAY_OF_WEEK_INDEX = 7;
@@ -82,9 +84,8 @@ export const useDateRangePicker = () => {
     selectedDay,
     handleDayClick,
     cancelSelectedDates,
-    isCancelled,
-    resetCancellation,
   } = useDateSelection();
+  const addToast = useToast();
 
   useEffect(() => {
     dispatch({
@@ -96,13 +97,6 @@ export const useDateRangePicker = () => {
       payload: endDate ? endDate.toISOString().split("T")[0] : "",
     });
   }, [startDate, endDate]);
-
-  useEffect(() => {
-    if (isCancelled) {
-      dispatch({ type: "RESET" });
-      resetCancellation();
-    }
-  }, [isCancelled]);
 
   const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -129,10 +123,7 @@ export const useDateRangePicker = () => {
       dateSchema.validateSync(state.inputStartDate);
       dispatch({ type: "SET_DATE_ERROR", payload: null });
     } catch (error) {
-      dispatch({
-        type: "SET_DATE_ERROR",
-        payload: (error as yup.ValidationError).message,
-      });
+      addToast((error as yup.ValidationError).message, "error");
     }
   };
 
@@ -141,10 +132,7 @@ export const useDateRangePicker = () => {
       dateSchema.validateSync(state.inputEndDate);
       dispatch({ type: "SET_DATE_ERROR", payload: null });
     } catch (error) {
-      dispatch({
-        type: "SET_DATE_ERROR",
-        payload: (error as yup.ValidationError).message,
-      });
+      addToast((error as yup.ValidationError).message, "error");
     }
   };
 
@@ -212,6 +200,5 @@ export const useDateRangePicker = () => {
     generateDaysInMonth,
     selectedDay,
     isValidDate,
-    dispatch,
   };
 };
