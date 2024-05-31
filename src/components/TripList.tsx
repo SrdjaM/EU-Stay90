@@ -19,6 +19,7 @@ import EditTripModal from "./EditTripModal";
 import DropdownMenu from "../custom/components/DropdownMenu";
 import { TripListActionTypes } from "../common/enums/ActionTypes";
 import { initialState, reducer } from "../common/hooks/tripListReducer";
+import { useToast } from "../contexts/ToastContext";
 
 const DAYS_AVAILABLE_IN_EU = 90;
 
@@ -30,6 +31,8 @@ export interface Trip {
 
 const TripList: React.FC = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
+
+  const addToast = useToast();
 
   const { userId } = useUser();
 
@@ -144,8 +147,7 @@ const TripList: React.FC = () => {
         dispatch({ type: TripListActionTypes.SET_LOADING, payload: false });
       },
       (error) => {
-        console.error("Error listening to trips updates:", error);
-        // TODO: set error message in toast notification
+        addToast(error.message, "error");
         dispatch({ type: TripListActionTypes.SET_LOADING, payload: false });
       }
     );
@@ -191,9 +193,13 @@ const TripList: React.FC = () => {
   const handleDeleteTrip = async (tripId: string) => {
     try {
       await deleteDoc(doc(db, "trips", tripId));
-      // TODO: set success message in toast notification
+      addToast("Successfully deleted trip!", "success");
     } catch (error) {
-      // TODO: set error message in toast notification
+      if (error instanceof Error) {
+        addToast(`Failed to delete trip: ${error.message}`, "error");
+      } else {
+        addToast("Failed to delete trip due to an unknown error.", "error");
+      }
     }
   };
 
