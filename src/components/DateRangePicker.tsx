@@ -9,6 +9,7 @@ import Button from "./Button";
 import RoundButton from "../custom/components/RoundButton";
 import { months, daysOfWeek } from "../common/constants/constants";
 import { UI_TEXT } from "../common/constants/constants";
+import { useToast } from "../contexts/ToastContext";
 import classes from "../styles/DateRangePicker.module.scss";
 import { useDateRangePicker } from "../custom/hooks/useDateRangePicker";
 
@@ -26,6 +27,8 @@ interface Day {
 }
 
 const DateRangePicker: React.FC = () => {
+  const addToast = useToast();
+
   const { userId } = useUser();
   const {
     state,
@@ -148,13 +151,16 @@ const DateRangePicker: React.FC = () => {
 
         await addDoc(collection(db, "trips"), newTrip);
 
+        addToast("Trip added successfully!", "success");
+
         cancelSelectedDates();
       }
-    } catch (error: any) {
-      dispatch({
-        type: "SET_DATE_ERROR",
-        payload: error.message,
-      });
+    } catch (error) {
+      if (error instanceof Error) {
+        addToast(`Failed to add trip: ${error.message}`, "error");
+      } else {
+        addToast("Failed to add trip due to an unknown error.", "error");
+      }
     }
   };
 
