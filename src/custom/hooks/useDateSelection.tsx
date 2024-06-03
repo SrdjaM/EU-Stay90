@@ -5,12 +5,10 @@ export function useDateSelection() {
     startDate: Date | null;
     endDate: Date | null;
     selectedDay: Date | null;
-    isCancelled: boolean;
   }>({
     startDate: null,
     endDate: null,
     selectedDay: null,
-    isCancelled: false,
   });
 
   const handleDayClick = (date: Date | null) => {
@@ -30,7 +28,6 @@ export function useDateSelection() {
           startDate: date,
           endDate: null,
           selectedDay: date,
-          isCancelled: false,
         };
       }
     });
@@ -41,7 +38,6 @@ export function useDateSelection() {
       startDate: null,
       endDate: null,
       selectedDay: null,
-      isCancelled: true,
     });
   };
 
