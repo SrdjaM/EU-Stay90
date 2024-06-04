@@ -20,6 +20,7 @@ import DropdownMenu from "../custom/components/DropdownMenu";
 import { TripListActionTypes } from "../common/enums/ActionTypes";
 import { initialState, reducer } from "../common/hooks/tripListReducer";
 import { useToast } from "../contexts/ToastContext";
+import { Position } from "../common/enums/Position";
 
 const DAYS_AVAILABLE_IN_EU = 90;
 
@@ -105,6 +106,7 @@ const TripList: React.FC = () => {
               items={getDropdownItems(trip.id)}
               isOpen={isDropdownOpened(trip.id)}
               onToggle={() => toggleDropdown(trip.id)}
+              position={Position.BottomLeft}
             />
           </div>
         </div>

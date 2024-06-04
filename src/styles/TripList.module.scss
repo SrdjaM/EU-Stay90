@@ -127,7 +127,6 @@
   margin-bottom: $spacing-xs;
   color: $black-color;
   font-weight: $bold-fontweight;
-  z-index: 5;
   position: relative;
 
   @include breakpoint-md-and-lower {

@@ -5,27 +5,18 @@
 
 .dropdown_container {
   cursor: pointer;
-  position: relative;
-  z-index: 10;
+}
+
+.dropdown_toggle {
+  width: 0.75rem;
 }
 
 .dropdown_menu {
   position: absolute;
-  left: -6rem;
-  top: -100%;
   color: $gray-light--1;
   border: $thick-border--light;
   border-radius: $border-radius-xs;
   background-color: $white-color;
-  z-index: 6;
-  @include breakpoint-md-and-lower {
-    left: -5rem;
-    top: -120%;
-  }
-}
-
-.dropdown_menu .dropdown_item:last-child {
-  border-bottom: none;
 }
 
 .dropdown_item {
@@ -33,6 +24,8 @@
   padding: $spacing-xs;
   display: flex;
   align-items: center;
+  cursor: pointer;
+  font-weight: $bold-fontweight;
   &:hover {
     color: $gray-dark--1;
   }
