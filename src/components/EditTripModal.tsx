@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React from "react";
 import { Trip } from "./TripList";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
 
+import { useToast } from "../contexts/ToastContext";
 import Button from "./Button";
 import classes from "../styles/EditTripModal.module.scss";
+import DateRangePicker from "./DateRangePicker";
+import { useDate } from "../contexts/DateContext";
 
 interface EditTripModalProps {
   trip: Trip;
@@ -17,6 +20,8 @@ const EditTripModal: React.FC<EditTripModalProps> = ({
   tripId,
   onClose,
 }) => {
+  const { startDate, endDate, cancelSelectedDates } = useDate();
+
   const toLocalDateString = (date: Date) => {
     const localDate = new Date(date);
 
@@ -26,33 +31,35 @@ const EditTripModal: React.FC<EditTripModalProps> = ({
     return localDate.toISOString().split("T")[0];
   };
 
-  const [startDate, setStartDate] = useState(toLocalDateString(trip.startDate));
-  const [endDate, setEndDate] = useState(toLocalDateString(trip.endDate));
+  const addToast = useToast();
+
+  const handleOnClose = () => {
+    onClose();
+    cancelSelectedDates();
+  };
 
   const handleSave = async () => {
     try {
+      if (!startDate || !endDate) {
+        addToast("Start date and end date cannot be empty.", "error");
+        return;
+      }
+
       const tripRef = doc(db, "trips", tripId);
 
-      const startUTCDate = new Date(startDate);
-      startUTCDate.setMinutes(
-        startUTCDate.getMinutes() + startUTCDate.getTimezoneOffset()
-      );
-
-      const endUTCDate = new Date(endDate);
-      endUTCDate.setMinutes(
-        endUTCDate.getMinutes() + endUTCDate.getTimezoneOffset()
-      );
-
       await updateDoc(tripRef, {
-        startDate: startUTCDate.toISOString(),
-        endDate: endUTCDate.toISOString(),
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
       });
 
-      onClose();
-      //TODO: set success message in toast notification
-    } catch (error) {
-      //TODO: set error message in toast notification
-      console.error("Error updating document: ", error);
+      handleOnClose();
+      addToast("Trip edited successfully ", "success");
+    } catch (error: any) {
+      if (error instanceof Error) {
+        addToast(`Failed to edit trip: ${error.message}`, "error");
+      } else {
+        addToast("Failed to edit trip due to an unknown error.", "error");
+      }
     }
   };
 
@@ -60,28 +67,15 @@ const EditTripModal: React.FC<EditTripModalProps> = ({
     <div className={classes.modal}>
       <div className={classes["modal_content"]}>
         <h2 className={classes["modal_heading"]}>Edit Trip</h2>
-        <label className={classes["edit-input_label"]}>
-          Start Date
-          <input
-            className={classes["edit-input"]}
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
-        </label>
-        <label className={classes["edit-input_label"]}>
-          End Date
-          <input
-            className={classes["edit-input"]}
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
-        </label>
+        <DateRangePicker
+          initialStartDate={toLocalDateString(trip.startDate)}
+          initialEndDate={toLocalDateString(trip.endDate)}
+          isInEdit={true}
+        />
         <Button variant="primary" onClick={handleSave}>
           Save
         </Button>
-        <Button variant="primary" onClick={onClose}>
+        <Button variant="primary" onClick={handleOnClose}>
           Cancel
         </Button>
       </div>

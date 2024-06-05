@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
 import { db } from "../firebase";
 import { addDoc, collection } from "firebase/firestore";
@@ -7,7 +7,7 @@ import classNames from "classnames";
 
 import Button from "./Button";
 import { useMonthYear } from "../custom/hooks/useMonthYear";
-import { useDateSelection } from "../custom/hooks/useDateSelection";
+import { useDate } from "../contexts/DateContext";
 import RoundButton from "../custom/components/RoundButton";
 import { formatDate } from "../custom/utils/dateUtils";
 import { months, daysOfWeek } from "../common/constants/constants";
@@ -33,7 +33,17 @@ interface Day {
   isInRange?: boolean;
 }
 
-const DateRangePicker: React.FC = () => {
+interface DateRangePickerProps {
+  initialStartDate?: string;
+  initialEndDate?: string;
+  isInEdit?: boolean;
+}
+
+const DateRangePicker: React.FC<DateRangePickerProps> = ({
+  initialStartDate,
+  initialEndDate,
+  isInEdit,
+}) => {
   const { currentMonth, currentYear, changeMonth, getNextMonthAndYear } =
     useMonthYear();
   const {
@@ -42,10 +52,17 @@ const DateRangePicker: React.FC = () => {
     selectedDay,
     handleDayClick,
     cancelSelectedDates,
-  } = useDateSelection();
+    setStartDate,
+    setEndDate,
+  } = useDate();
   const addToast = useToast();
 
   const { userId } = useUser();
+
+  useEffect(() => {
+    if (initialStartDate) setStartDate(new Date(initialStartDate));
+    if (initialEndDate) setEndDate(new Date(initialEndDate));
+  }, [initialStartDate, initialEndDate]);
 
   const generateDaysInMonth = (
     year: number,
@@ -81,9 +98,19 @@ const DateRangePicker: React.FC = () => {
       days.push({ date, dayOfMonth: dayIndex });
     }
 
+    const normalizeDate = (date: Date) => {
+      const utcDate = new Date(date.toISOString());
+      utcDate.setMinutes(utcDate.getMinutes() + utcDate.getTimezoneOffset());
+      return utcDate;
+    };
+
+    const normalizedStartDate = startDate && normalizeDate(startDate);
+    const normalizedEndDate = endDate && normalizeDate(endDate);
+
     days.forEach((day) => {
-      if (startDate && endDate && day.date) {
-        day.isInRange = day.date >= startDate && day.date <= endDate;
+      if (normalizedStartDate && normalizedEndDate && day.date) {
+        day.isInRange =
+          day.date >= normalizedStartDate && day.date <= normalizedEndDate;
       } else {
         day.isInRange = false;
       }
@@ -212,8 +239,12 @@ const DateRangePicker: React.FC = () => {
   const currentMonthDays = generateDaysInMonth(currentYear, currentMonth, true);
   const nextMonthDays = generateDaysInMonth(nextYear, nextMonth, true);
 
+  const dateRangeClass = classNames(classes["date-range"], {
+    [classes.modal]: isInEdit,
+  });
+
   return (
-    <div className={classes["date-range"]}>
+    <div className={dateRangeClass}>
       <div className={classes["picked-date"]}>
         {startDate && (
           <span className={classes["picked-date__start-day--span"]}>
@@ -244,16 +275,20 @@ const DateRangePicker: React.FC = () => {
         />
       </div>
       <div className={classes["btn-action"]}>
-        <div className={classes["btn-container"]}>
-          <Button onClick={handleConfirmDates} variant="primary">
-            {UI_TEXT.CONFIRM}
-          </Button>
-        </div>
-        <div className={classes["btn-container"]}>
-          <Button onClick={cancelSelectedDates} variant="primary">
-            {UI_TEXT.CANCEL}
-          </Button>
-        </div>
+        {!isInEdit && (
+          <>
+            <div className={classes["btn-container"]}>
+              <Button onClick={handleConfirmDates} variant="primary">
+                {UI_TEXT.CONFIRM}
+              </Button>
+            </div>
+            <div className={classes["btn-container"]}>
+              <Button onClick={cancelSelectedDates} variant="primary">
+                {UI_TEXT.CANCEL}
+              </Button>
+            </div>
+          </>
+        )}
       </div>
       <div className={classes["date-range__days"]}>
         <div>
