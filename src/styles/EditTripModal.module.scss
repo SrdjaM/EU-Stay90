@@ -11,6 +11,7 @@
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 1000;
+  overflow-y: scroll;
   @include flex-center();
 }
 
@@ -21,15 +22,20 @@
   text-align: center;
   min-width: 18rem;
 
-  @include breakpoint-sm-and-lower {
-    padding: $spacing-sm;
-    min-width: 15rem;
+  @include breakpoint-md-and-lower {
+    width: 100%;
+    padding: 0;
+    height: 100%;
   }
 }
 
 .modal_heading {
   color: $gray-dark--1;
   text-transform: uppercase;
+
+  @include breakpoint-md-and-lower {
+    margin-bottom: -1rem;
+  }
 }
 
 .edit-input_label {
@@ -59,4 +65,27 @@
 
 button {
   margin: 0 10px;
+}
+
+.btn_container {
+  display: flex;
+  justify-content: center;
+  margin-top: $spacing-lg;
+
+  @include breakpoint-md-and-lower {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: $spacing-sm $spacing-sm 0 $spacing-sm;
+    background-color: $white-color;
+    box-shadow: $box-shadow-top;
+    z-index: 1001;
+  }
+}
+
+.modal-content_separator {
+  @include breakpoint-md-and-lower {
+    height: 1.5rem;
+  }
 }

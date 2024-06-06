@@ -72,12 +72,15 @@ const EditTripModal: React.FC<EditTripModalProps> = ({
           initialEndDate={toLocalDateString(trip.endDate)}
           isInEdit={true}
         />
-        <Button variant="primary" onClick={handleSave}>
-          Save
-        </Button>
-        <Button variant="primary" onClick={handleOnClose}>
-          Cancel
-        </Button>
+        <div className={classes["modal-content_separator"]}></div>
+        <div className={classes["btn_container"]}>
+          <Button variant="primary" onClick={handleSave}>
+            Save
+          </Button>
+          <Button variant="primary" onClick={handleOnClose}>
+            Cancel
+          </Button>
+        </div>
       </div>
     </div>
   );
