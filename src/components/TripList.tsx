@@ -6,7 +6,7 @@ import { useUser } from "../contexts/UserContext";
 import { formatDate } from "../custom/utils/dateUtils";
 import classes from "../styles/TripList.module.scss";
 import { months } from "../common/constants/constants";
-import Loader from "./Loader";
+import Loader from "../custom/components/Loader";
 
 const DAYS_AVAILABLE_IN_EU = 90;
 
@@ -106,7 +106,7 @@ const TripList: React.FC = () => {
 
   const renderTripList = () => {
     if (loading) {
-      return <Loader loading={loading} />;
+      return <Loader />;
     } else if (trips.length > 0) {
       return <ul className={classes["trip-list__list"]}>{listItems()}</ul>;
     } else {
