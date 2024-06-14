@@ -41,5 +41,9 @@ export function useDateSelection() {
     });
   };
 
-  return { ...selection, handleDayClick, cancelSelectedDates };
+  return {
+    ...selection,
+    handleDayClick,
+    cancelSelectedDates,
+  };
 }
