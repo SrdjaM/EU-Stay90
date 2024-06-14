@@ -35,10 +35,8 @@ const DateRangePicker: React.FC = () => {
   const { userId } = useUser();
   const {
     state,
-    handleStartDateChange,
-    handleEndDateChange,
-    handleStartDateBlur,
-    handleEndDateBlur,
+    handleDateChange,
+    handleDateBlur,
     cancelSelectedDates,
     changeMonth,
     currentMonth,
@@ -189,8 +187,8 @@ const DateRangePicker: React.FC = () => {
           ref={startDateRef}
           placeholder="Start Date"
           className={classes["picked-date__start-day"]}
-          onChange={handleStartDateChange}
-          onBlur={handleStartDateBlur}
+          onChange={(e) => handleDateChange(e, "SET_START_DATE")}
+          onBlur={() => handleDateBlur(state.inputStartDate)}
         />
 
         {state.inputEndDate && (
@@ -204,8 +202,8 @@ const DateRangePicker: React.FC = () => {
           ref={endDateRef}
           placeholder="End Date"
           className={classes["picked-date__end-day"]}
-          onChange={handleEndDateChange}
-          onBlur={handleEndDateBlur}
+          onChange={(e) => handleDateChange(e, "SET_END_DATE")}
+          onBlur={() => handleDateBlur(state.inputEndDate)}
         />
       </div>
       <div className={classes["input-error"]}>

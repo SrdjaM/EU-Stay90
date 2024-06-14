@@ -98,38 +98,22 @@ export const useDateRangePicker = () => {
     });
   }, [startDate, endDate]);
 
-  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDateChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    type: "SET_START_DATE" | "SET_END_DATE"
+  ) => {
     const value = e.target.value;
     const date = new Date(value);
-    dispatch({ type: "SET_START_DATE", payload: value });
+    dispatch({ type: type, payload: value });
 
     if (!isNaN(date.getTime()) && isValidDate(value)) {
       handleDayClick(date);
     }
   };
 
-  const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    const date = new Date(value);
-    dispatch({ type: "SET_END_DATE", payload: value });
-
-    if (!isNaN(date.getTime()) && isValidDate(value)) {
-      handleDayClick(date);
-    }
-  };
-
-  const handleStartDateBlur = () => {
+  const handleDateBlur = (dateString: string) => {
     try {
-      dateSchema.validateSync(state.inputStartDate);
-      dispatch({ type: "SET_DATE_ERROR", payload: null });
-    } catch (error) {
-      addToast((error as yup.ValidationError).message, "error");
-    }
-  };
-
-  const handleEndDateBlur = () => {
-    try {
-      dateSchema.validateSync(state.inputEndDate);
+      dateSchema.validateSync(dateString);
       dispatch({ type: "SET_DATE_ERROR", payload: null });
     } catch (error) {
       addToast((error as yup.ValidationError).message, "error");
@@ -187,10 +171,8 @@ export const useDateRangePicker = () => {
 
   return {
     state,
-    handleStartDateChange,
-    handleEndDateChange,
-    handleStartDateBlur,
-    handleEndDateBlur,
+    handleDateChange,
+    handleDateBlur,
     cancelSelectedDates,
     changeMonth,
     currentMonth,
