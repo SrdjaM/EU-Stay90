@@ -1,0 +1,33 @@
+@import "colors";
+@import "_variables";
+
+.loader {
+  position: relative;
+  height: 4.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.star {
+  position: absolute;
+  color: $primary-color;
+  animation: spin 1.2s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg) translate(1.5rem) rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg) translate(1.5rem) rotate(-360deg);
+  }
+}
+
+@for $i from 0 through 7 {
+  .star#{$i} {
+    animation-delay: #{-1.2s + $i * 0.15s};
+    font-size: #{1.5rem - $i * 0.125rem};
+    opacity: #{1 - $i / 10};
+  }
+}

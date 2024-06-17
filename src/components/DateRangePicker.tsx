@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect }, { useRef } from "react";
 import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
 import { db } from "../firebase";
 import { addDoc, collection } from "firebase/firestore";
@@ -9,23 +9,18 @@ import Button from "./Button";
 import { useMonthYear } from "../custom/hooks/useMonthYear";
 import { useDate } from "../contexts/DateContext";
 import RoundButton from "../custom/components/RoundButton";
-import { formatDate } from "../custom/utils/dateUtils";
 import { months, daysOfWeek } from "../common/constants/constants";
 import { UI_TEXT } from "../common/constants/constants";
 import { useToast } from "../contexts/ToastContext";
 import classes from "../styles/DateRangePicker.module.scss";
+import { useDateRangePicker } from "../custom/hooks/useDateRangePicker";
 
-interface NewTrip {
-  userId: string;
-  startDate: string;
-  endDate: string;
-}
-
-const FIRST_DAY_OF_WEEK_INDEX = 0;
-const LAST_DAY_OF_WEEK_INDEX = 7;
-const OFFSET_TO_MONDAY = 2;
 const TO_PREVIOUS_MONTH = -1;
 const TO_NEXT_MONTH = 1;
+const NEXT_DAY = 1;
+const PREVIOUS_DAY = -1;
+const NEXT_7_DAYS = 7;
+const PREVIOUS_7_DAYS = -7;
 
 interface Day {
   date: Date | null;
@@ -56,6 +51,9 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
     setEndDate,
   } = useDate();
   const addToast = useToast();
+
+  const startDateRef = useRef<HTMLInputElement>(null);
+  const endDateRef = useRef<HTMLInputElement>(null);
 
   const { userId } = useUser();
 
@@ -118,11 +116,22 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
 
     return days;
   };
+  const {
+    state,
+    handleDateChange,
+    handleDateBlur,
+    cancelSelectedDates,
+    changeMonth,
+    currentMonth,
+    currentYear,
+    getNextMonthAndYear,
+    handleDayClick,
+    generateDaysInMonth,
+    selectedDay,
+    isValidDate,
+  } = useDateRangePicker();
 
   const { month: nextMonth, year: nextYear } = getNextMonthAndYear();
-
-  const formattedStartDate = startDate ? formatDate(startDate, months) : "";
-  const formattedEndDate = endDate ? formatDate(endDate, months) : "";
 
   const renderDaysGrid = (days: Day[], startingIndex: number = 0) => {
     return days.map((day, index) => {
@@ -144,19 +153,19 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
             break;
           case "ArrowRight":
             event.preventDefault();
-            moveFocus(adjustedIndex, 1);
+            moveFocus(adjustedIndex, NEXT_DAY);
             break;
           case "ArrowLeft":
             event.preventDefault();
-            moveFocus(adjustedIndex, -1);
+            moveFocus(adjustedIndex, PREVIOUS_DAY);
             break;
           case "ArrowDown":
             event.preventDefault();
-            moveFocus(adjustedIndex, 7);
+            moveFocus(adjustedIndex, NEXT_7_DAYS);
             break;
           case "ArrowUp":
             event.preventDefault();
-            moveFocus(adjustedIndex, -7);
+            moveFocus(adjustedIndex, PREVIOUS_7_DAYS);
             break;
           default:
             break;
@@ -196,14 +205,6 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
     targetElement?.focus();
   };
 
-  const handlePreviousMonth = () => {
-    changeMonth(TO_PREVIOUS_MONTH);
-  };
-
-  const handleNextMonth = () => {
-    changeMonth(TO_NEXT_MONTH);
-  };
-
   const renderDaysOfWeek = () => {
     return daysOfWeek.map((day) => (
       <div key={day} className={classes["days-of-week__day"]}>
@@ -214,11 +215,21 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
 
   const handleConfirmDates = async () => {
     try {
-      if (startDate && endDate) {
-        const newTrip: NewTrip = {
+      if (state.inputStartDate && state.inputEndDate) {
+        const isValidStartDate = isValidDate(state.inputStartDate);
+        const isValidEndDate = isValidDate(state.inputEndDate);
+
+        if (!isValidStartDate || !isValidEndDate) {
+          throw new Error("Wrong date input");
+        }
+
+        const startDateISO = new Date(state.inputStartDate).toISOString();
+        const endDateISO = new Date(state.inputEndDate).toISOString();
+
+        const newTrip = {
           userId: userId || "",
-          startDate: startDate.toISOString(),
-          endDate: endDate.toISOString(),
+          startDate: startDateISO,
+          endDate: endDateISO,
         };
 
         await addDoc(collection(db, "trips"), newTrip);
@@ -243,36 +254,47 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
     [classes.modal]: isInEdit,
   });
 
+  const handleCancelDates = () => {
+    cancelSelectedDates();
+    if (startDateRef.current) startDateRef.current.value = "";
+    if (endDateRef.current) endDateRef.current.value = "";
+  };
+
   return (
     <div className={dateRangeClass}>
       <div className={classes["picked-date"]}>
-        {startDate && (
+        {state.inputStartDate && (
           <span className={classes["picked-date__start-day--span"]}>
             start date
           </span>
         )}
         <input
-          type="text"
-          value={formattedStartDate}
+          type="date"
+          value={state.inputStartDate}
+          ref={startDateRef}
           placeholder="Start Date"
           className={classes["picked-date__start-day"]}
-          readOnly
-          tabIndex={-1}
+          onChange={(e) => handleDateChange(e, "SET_START_DATE")}
+          onBlur={() => handleDateBlur(state.inputStartDate)}
         />
 
-        {endDate && (
+        {state.inputEndDate && (
           <span className={classes["picked-date__end-day--span"]}>
             end date
           </span>
         )}
         <input
-          type="text"
-          value={formattedEndDate}
+          type="date"
+          value={state.inputEndDate}
+          ref={endDateRef}
           placeholder="End Date"
           className={classes["picked-date__end-day"]}
-          readOnly
-          tabIndex={-1}
+          onChange={(e) => handleDateChange(e, "SET_END_DATE")}
+          onBlur={() => handleDateBlur(state.inputEndDate)}
         />
+      </div>
+      <div className={classes["input-error"]}>
+        {state.inputDateError && <span>{state.inputDateError}</span>}
       </div>
       <div className={classes["btn-action"]}>
         {!isInEdit && (
@@ -294,7 +316,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
         <div>
           <div className={classes["date-range__current-month"]}>
             <RoundButton
-              onButtonClick={handlePreviousMonth}
+              onButtonClick={() => changeMonth(TO_PREVIOUS_MONTH)}
               icon={faAngleLeft}
               ariaLabel="Go to previous month"
               className={classes.left}
@@ -310,7 +332,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
           <div className={classes["date-range__next-month"]}>
             {`${months[nextMonth]} ${nextYear}`}
             <RoundButton
-              onButtonClick={handleNextMonth}
+              onButtonClick={() => changeMonth(TO_NEXT_MONTH)}
               icon={faAngleRight}
               ariaLabel="Go to next month"
               className={classes.right}

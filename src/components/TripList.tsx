@@ -14,7 +14,7 @@ import { faEdit, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { formatDate } from "../custom/utils/dateUtils";
 import classes from "../styles/TripList.module.scss";
 import { months } from "../common/constants/constants";
-import Loader from "./Loader";
+import Loader from "../custom/components/Loader";
 import EditTripModal from "./EditTripModal";
 import DropdownMenu from "../custom/components/DropdownMenu";
 import { TripListActionTypes } from "../common/enums/ActionTypes";
