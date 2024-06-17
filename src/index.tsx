@@ -6,6 +6,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { UserProvider } from "./contexts/UserContext";
 import { BrowserRouter } from "react-router-dom";
 import { ToastProvider } from "./contexts/ToastContext";
+import { DateProvider } from "./contexts/DateContext";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -16,7 +17,9 @@ root.render(
       <AuthProvider>
         <UserProvider>
           <ToastProvider>
-            <App />
+            <DateProvider>
+              <App />
+            </DateProvider>
           </ToastProvider>
         </UserProvider>
       </AuthProvider>

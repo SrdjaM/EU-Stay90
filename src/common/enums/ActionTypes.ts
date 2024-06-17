@@ -5,3 +5,10 @@ export enum ActionTypes {
   SET_IS_SUCCESS = "SET_IS_SUCCESS",
   SET_TOUCHED = "SET_TOUCHED",
 }
+
+export enum TripListActionTypes {
+  SET_TRIPS = "SET_TRIPS",
+  SET_LOADING = "SET_LOADING",
+  SET_EDIT_TRIP_ID = "SET_EDIT_TRIP_ID",
+  SET_OPEN_DROPDOWN_ID = "SET_OPEN_DROPDOWN_ID",
+}

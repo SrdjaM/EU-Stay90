@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
 import { db } from "../firebase";
 import { addDoc, collection } from "firebase/firestore";
@@ -6,6 +6,7 @@ import { useUser } from "../contexts/UserContext";
 import classNames from "classnames";
 
 import Button from "./Button";
+import { useDate } from "../contexts/DateContext";
 import RoundButton from "../custom/components/RoundButton";
 import { months, daysOfWeek } from "../common/constants/constants";
 import { UI_TEXT } from "../common/constants/constants";
@@ -26,13 +27,30 @@ interface Day {
   isInRange?: boolean;
 }
 
-const DateRangePicker: React.FC = () => {
+interface DateRangePickerProps {
+  initialStartDate?: string;
+  initialEndDate?: string;
+  isInEdit?: boolean;
+}
+
+const DateRangePicker: React.FC<DateRangePickerProps> = ({
+  initialStartDate,
+  initialEndDate,
+  isInEdit,
+}) => {
+  const { setStartDate, setEndDate } = useDate();
   const addToast = useToast();
 
   const startDateRef = useRef<HTMLInputElement>(null);
   const endDateRef = useRef<HTMLInputElement>(null);
 
   const { userId } = useUser();
+
+  useEffect(() => {
+    if (initialStartDate) setStartDate(new Date(initialStartDate));
+    if (initialEndDate) setEndDate(new Date(initialEndDate));
+  }, [initialStartDate, initialEndDate]);
+
   const {
     state,
     handleDateChange,
@@ -167,6 +185,10 @@ const DateRangePicker: React.FC = () => {
   const currentMonthDays = generateDaysInMonth(currentYear, currentMonth, true);
   const nextMonthDays = generateDaysInMonth(nextYear, nextMonth, true);
 
+  const dateRangeClass = classNames(classes["date-range"], {
+    [classes.modal]: isInEdit,
+  });
+
   const handleCancelDates = () => {
     cancelSelectedDates();
     if (startDateRef.current) startDateRef.current.value = "";
@@ -174,7 +196,7 @@ const DateRangePicker: React.FC = () => {
   };
 
   return (
-    <div className={classes["date-range"]}>
+    <div className={dateRangeClass}>
       <div className={classes["picked-date"]}>
         {state.inputStartDate && (
           <span className={classes["picked-date__start-day--span"]}>
@@ -210,16 +232,20 @@ const DateRangePicker: React.FC = () => {
         {state.inputDateError && <span>{state.inputDateError}</span>}
       </div>
       <div className={classes["btn-action"]}>
-        <div className={classes["btn-container"]}>
-          <Button onClick={handleConfirmDates} variant="primary">
-            {UI_TEXT.CONFIRM}
-          </Button>
-        </div>
-        <div className={classes["btn-container"]}>
-          <Button onClick={handleCancelDates} variant="primary">
-            {UI_TEXT.CANCEL}
-          </Button>
-        </div>
+        {!isInEdit && (
+          <>
+            <div className={classes["btn-container"]}>
+              <Button onClick={handleConfirmDates} variant="primary">
+                {UI_TEXT.CONFIRM}
+              </Button>
+            </div>
+            <div className={classes["btn-container"]}>
+              <Button onClick={handleCancelDates} variant="primary">
+                {UI_TEXT.CANCEL}
+              </Button>
+            </div>
+          </>
+        )}
       </div>
       <div className={classes["date-range__days"]}>
         <div>
