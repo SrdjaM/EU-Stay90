@@ -2,8 +2,8 @@ import { useEffect, useReducer } from "react";
 import * as yup from "yup";
 
 import { useMonthYear } from "./useMonthYear";
-import { useDateSelection } from "./useDateSelection";
 import { useToast } from "../../contexts/ToastContext";
+import { useDate } from "../../contexts/DateContext";
 
 const FIRST_DAY_OF_WEEK_INDEX = 0;
 const LAST_DAY_OF_WEEK_INDEX = 7;
@@ -84,7 +84,7 @@ export const useDateRangePicker = () => {
     selectedDay,
     handleDayClick,
     cancelSelectedDates,
-  } = useDateSelection();
+  } = useDate();
   const addToast = useToast();
 
   useEffect(() => {

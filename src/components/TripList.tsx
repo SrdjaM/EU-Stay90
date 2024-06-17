@@ -158,7 +158,7 @@ const TripList: React.FC = () => {
 
   const renderTripList = () => {
     if (state.loading) {
-      return <Loader loading={state.loading} />;
+      return <Loader />;
     } else if (state.trips.length > 0) {
       return <ul className={classes["trip-list__list"]}>{listItems()}</ul>;
     } else {

@@ -1,4 +1,4 @@
-import React, { useEffect }, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
 import { db } from "../firebase";
 import { addDoc, collection } from "firebase/firestore";
@@ -39,17 +39,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   initialEndDate,
   isInEdit,
 }) => {
-  const { currentMonth, currentYear, changeMonth, getNextMonthAndYear } =
-    useMonthYear();
-  const {
-    startDate,
-    endDate,
-    selectedDay,
-    handleDayClick,
-    cancelSelectedDates,
-    setStartDate,
-    setEndDate,
-  } = useDate();
+  const { setStartDate, setEndDate } = useDate();
   const addToast = useToast();
 
   const startDateRef = useRef<HTMLInputElement>(null);
@@ -62,60 +52,6 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
     if (initialEndDate) setEndDate(new Date(initialEndDate));
   }, [initialStartDate, initialEndDate]);
 
-  const generateDaysInMonth = (
-    year: number,
-    month: number,
-    includePreviousMonthDays: boolean = false
-  ): Day[] => {
-    const days: Day[] = [];
-    const firstDayOfMonth = new Date(year, month, 1);
-    const lastDayOfMonth = new Date(year, month + 1, 0);
-    const lastDayOfPreviousMonth = new Date(year, month, 0);
-
-    let startingDayIndex = firstDayOfMonth.getDay();
-
-    if (startingDayIndex === FIRST_DAY_OF_WEEK_INDEX) {
-      startingDayIndex = LAST_DAY_OF_WEEK_INDEX;
-    }
-
-    if (includePreviousMonthDays) {
-      const daysInPreviousMonth = lastDayOfPreviousMonth.getDate();
-
-      for (
-        let dayIndex =
-          daysInPreviousMonth - startingDayIndex + OFFSET_TO_MONDAY;
-        dayIndex <= daysInPreviousMonth;
-        dayIndex++
-      ) {
-        days.push({ date: null, dayOfMonth: dayIndex });
-      }
-    }
-
-    for (let dayIndex = 1; dayIndex <= lastDayOfMonth.getDate(); dayIndex++) {
-      const date = new Date(year, month, dayIndex);
-      days.push({ date, dayOfMonth: dayIndex });
-    }
-
-    const normalizeDate = (date: Date) => {
-      const utcDate = new Date(date.toISOString());
-      utcDate.setMinutes(utcDate.getMinutes() + utcDate.getTimezoneOffset());
-      return utcDate;
-    };
-
-    const normalizedStartDate = startDate && normalizeDate(startDate);
-    const normalizedEndDate = endDate && normalizeDate(endDate);
-
-    days.forEach((day) => {
-      if (normalizedStartDate && normalizedEndDate && day.date) {
-        day.isInRange =
-          day.date >= normalizedStartDate && day.date <= normalizedEndDate;
-      } else {
-        day.isInRange = false;
-      }
-    });
-
-    return days;
-  };
   const {
     state,
     handleDateChange,
@@ -305,7 +241,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
               </Button>
             </div>
             <div className={classes["btn-container"]}>
-              <Button onClick={cancelSelectedDates} variant="primary">
+              <Button onClick={handleCancelDates} variant="primary">
                 {UI_TEXT.CANCEL}
               </Button>
             </div>
