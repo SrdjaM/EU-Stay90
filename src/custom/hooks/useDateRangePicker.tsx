@@ -81,6 +81,8 @@ export const useDateRangePicker = () => {
   const {
     startDate,
     endDate,
+    setStartDate,
+    setEndDate,
     selectedDay,
     handleDayClick,
     cancelSelectedDates,
@@ -103,11 +105,15 @@ export const useDateRangePicker = () => {
     type: "SET_START_DATE" | "SET_END_DATE"
   ) => {
     const value = e.target.value;
-    const date = new Date(value);
-    dispatch({ type: type, payload: value });
+    dispatch({ type, payload: value });
 
-    if (!isNaN(date.getTime()) && isValidDate(value)) {
-      handleDayClick(date);
+    if (isValidDate(value)) {
+      const date = new Date(value);
+      if (type === "SET_START_DATE") {
+        setStartDate(date);
+      } else {
+        setEndDate(date);
+      }
     }
   };
 

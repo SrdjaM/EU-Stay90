@@ -6,7 +6,6 @@ import { useUser } from "../contexts/UserContext";
 import classNames from "classnames";
 
 import Button from "./Button";
-import { useMonthYear } from "../custom/hooks/useMonthYear";
 import { useDate } from "../contexts/DateContext";
 import RoundButton from "../custom/components/RoundButton";
 import { months, daysOfWeek } from "../common/constants/constants";
