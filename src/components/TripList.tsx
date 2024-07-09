@@ -2,17 +2,23 @@ import React, { useEffect, useState } from "react";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "../firebase";
 import { useUser } from "../contexts/UserContext";
+import ReactCountryFlag from "react-country-flag";
+import countries from "i18n-iso-countries";
+import enLocale from "i18n-iso-countries/langs/en.json";
 
 import { formatDate } from "../custom/utils/dateUtils";
 import classes from "../styles/TripList.module.scss";
 import { months } from "../common/constants/constants";
 import Loader from "../custom/components/Loader";
 
+countries.registerLocale(enLocale);
+
 const DAYS_AVAILABLE_IN_EU = 90;
 
 export interface Trip {
   startDate: Date;
   endDate: Date;
+  country: string;
 }
 
 const TripList: React.FC = () => {
@@ -49,6 +55,14 @@ const TripList: React.FC = () => {
     return last180DaysTrips.map((trip, index) => (
       <li key={index} className={classes["trip__list"]}>
         <div className={classes["trip__container"]}>
+          <div className={classes["trip_country"]}>
+            <div className={classes["trip_flag"]}>
+              <ReactCountryFlag countryCode={trip.country} svg />
+            </div>
+            <div className={classes["trip_country-name"]}>
+              {countries.getName(trip.country, "en")}
+            </div>
+          </div>
           <span className={classes["trip__start-date"]}>
             {formatDate(trip.startDate, months)}
           </span>
@@ -89,6 +103,7 @@ const TripList: React.FC = () => {
           tripsData.push({
             startDate: new Date(tripData.startDate),
             endDate: new Date(tripData.endDate),
+            country: tripData.country,
           });
         });
         tripsData.sort((a, b) => b.startDate.getTime() - a.startDate.getTime());

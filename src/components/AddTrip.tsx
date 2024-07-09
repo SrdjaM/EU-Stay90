@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
 import { db } from "../firebase";
 import { addDoc, collection } from "firebase/firestore";
@@ -12,6 +12,7 @@ import { UI_TEXT } from "../common/constants/constants";
 import { useToast } from "../contexts/ToastContext";
 import classes from "../styles/DateRangePicker.module.scss";
 import { useDateRangePicker } from "../custom/hooks/useDateRangePicker";
+import CountrySelect from "./CountrySelect";
 
 const TO_PREVIOUS_MONTH = -1;
 const TO_NEXT_MONTH = 1;
@@ -26,8 +27,9 @@ interface Day {
   isInRange?: boolean;
 }
 
-const DateRangePicker: React.FC = () => {
+const AddTrip: React.FC = () => {
   const addToast = useToast();
+  const [selectedCountry, setSelectedCountry] = useState<string>("");
 
   const startDateRef = useRef<HTMLInputElement>(null);
   const endDateRef = useRef<HTMLInputElement>(null);
@@ -147,6 +149,7 @@ const DateRangePicker: React.FC = () => {
           userId: userId || "",
           startDate: startDateISO,
           endDate: endDateISO,
+          country: selectedCountry,
         };
 
         await addDoc(collection(db, "trips"), newTrip);
@@ -154,6 +157,7 @@ const DateRangePicker: React.FC = () => {
         addToast("Trip added successfully!", "success");
 
         cancelSelectedDates();
+        setSelectedCountry("");
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -206,6 +210,7 @@ const DateRangePicker: React.FC = () => {
           onBlur={() => handleDateBlur(state.inputEndDate)}
         />
       </div>
+      <CountrySelect value={selectedCountry} onChange={setSelectedCountry} />
       <div className={classes["input-error"]}>
         {state.inputDateError && <span>{state.inputDateError}</span>}
       </div>
@@ -258,4 +263,4 @@ const DateRangePicker: React.FC = () => {
   );
 };
 
-export default DateRangePicker;
+export default AddTrip;

@@ -169,3 +169,13 @@
     text-align: start;
   }
 }
+
+.trip_country {
+  display: flex;
+  align-items: center;
+}
+
+.trip_flag {
+  margin-right: 0.4rem;
+  display: flex;
+}

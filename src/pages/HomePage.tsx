@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import DateRangePicker from "../components/DateRangePicker";
+import AddTrip from "../components/AddTrip";
 import TripList from "../components/TripList";
 import classes from "../styles/HomePage.module.scss";
 import RoundButton from "../custom/components/RoundButton";
@@ -36,7 +36,7 @@ const HomePage: React.FC = () => {
       </div>
 
       <div className={`${classes["home-page__picker"]} ${addVisibleClass()}`}>
-        <DateRangePicker />
+        <AddTrip />
       </div>
       <div className={classes["home-page__trips"]}>
         <TripList />
