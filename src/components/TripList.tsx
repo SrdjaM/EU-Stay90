@@ -8,7 +8,7 @@ import { formatDate } from "../custom/utils/dateUtils";
 import classes from "../styles/TripList.module.scss";
 import { months } from "../common/constants/constants";
 import Loader from "../custom/components/Loader";
-import { schengenCountries } from "./CountrySelect";
+import { schengenCountries } from "../common/constants/constants";
 
 const DAYS_AVAILABLE_IN_EU = 90;
 
