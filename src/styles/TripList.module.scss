@@ -128,15 +128,11 @@
   color: $black-color;
   font-weight: $bold-fontweight;
 
-  @include breakpoint-md-and-lower {
-    font-size: $font-sm;
-  }
-
-  @include breakpoint-sm-to-md-and-lower {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.25rem;
-  }
+  // @include breakpoint-sm-to-md-and-lower {
+  //   display: grid;
+  //   grid-template-columns: repeat(2, 1fr);
+  //   gap: 0.25rem;
+  // }
 }
 
 .trip__total-days {
@@ -147,26 +143,22 @@
   color: $white-color;
   font-size: $font-sm;
   @include breakpoint-sm-to-md-and-lower {
-    grid-column-start: 2;
-    grid-column-end: 3;
-    grid-row: auto / span 2;
+    font-size: $font-xs;
   }
 }
 
 .trip__start-date {
-  min-width: 8.5rem;
-  text-align: start;
-  @include breakpoint-sm-to-md-and-lower {
-    min-width: none;
+  margin-right: $spacing-xs;
+  @include breakpoint-md-and-lower {
+    margin-right: 0;
   }
 }
 
 .trip_end-date {
-  min-width: 8.5rem;
-  text-align: end;
-  @include breakpoint-sm-to-md-and-lower {
-    min-width: none;
-    text-align: start;
+  margin-left: $spacing-xs;
+
+  @include breakpoint-md-and-lower {
+    margin-left: 0;
   }
 }
 
@@ -178,4 +170,12 @@
 .trip_flag {
   margin-right: 0.4rem;
   display: flex;
+}
+
+.trip_date {
+  @include breakpoint-md-and-lower {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 }

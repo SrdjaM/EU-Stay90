@@ -3,15 +3,12 @@ import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "../firebase";
 import { useUser } from "../contexts/UserContext";
 import ReactCountryFlag from "react-country-flag";
-import countries from "i18n-iso-countries";
-import enLocale from "i18n-iso-countries/langs/en.json";
 
 import { formatDate } from "../custom/utils/dateUtils";
 import classes from "../styles/TripList.module.scss";
 import { months } from "../common/constants/constants";
 import Loader from "../custom/components/Loader";
-
-countries.registerLocale(enLocale);
+import { schengenCountries } from "./CountrySelect";
 
 const DAYS_AVAILABLE_IN_EU = 90;
 
@@ -57,21 +54,30 @@ const TripList: React.FC = () => {
         <div className={classes["trip__container"]}>
           <div className={classes["trip_country"]}>
             <div className={classes["trip_flag"]}>
-              <ReactCountryFlag countryCode={trip.country} svg />
+              <ReactCountryFlag
+                countryCode={
+                  schengenCountries.find(
+                    (country) => country.name === trip.country
+                  )?.code || ""
+                }
+                svg
+              />
             </div>
-            <div className={classes["trip_country-name"]}>
-              {countries.getName(trip.country, "en")}
-            </div>
+            <div className={classes["trip_country-name"]}>{trip.country}</div>
           </div>
-          <span className={classes["trip__start-date"]}>
-            {formatDate(trip.startDate, months)}
-          </span>
+          <div className={classes["trip_date"]}>
+            <span className={classes["trip__start-date"]}>
+              {formatDate(trip.startDate, months)}
+            </span>
+            -
+            <span className={classes["trip_end-date"]}>
+              {formatDate(trip.endDate, months)}
+            </span>
+          </div>
+
           <span className={classes["trip__total-days"]}>{`${countDays(
             trip
           )} days`}</span>
-          <span className={classes["trip_end-date"]}>
-            {formatDate(trip.endDate, months)}
-          </span>
         </div>
       </li>
     ));

@@ -1,6 +1,4 @@
 import React, { useState, FC } from "react";
-import countries from "i18n-iso-countries";
-import enLocale from "i18n-iso-countries/langs/en.json";
 import Flag from "react-country-flag";
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -8,57 +6,47 @@ import classNames from "classnames";
 
 import classes from "../styles/CountrySelect.module.scss";
 
-countries.registerLocale(enLocale);
-
-const schengenCountries = [
-  "AT",
-  "BE",
-  "CZ",
-  "DK",
-  "EE",
-  "FI",
-  "FR",
-  "DE",
-  "GR",
-  "HU",
-  "IS",
-  "IT",
-  "LV",
-  "LI",
-  "LT",
-  "LU",
-  "MT",
-  "NL",
-  "NO",
-  "PL",
-  "PT",
-  "SK",
-  "SI",
-  "ES",
-  "SE",
-  "CH",
+export const schengenCountries = [
+  { code: "AT", name: "Austria" },
+  { code: "BE", name: "Belgium" },
+  { code: "CZ", name: "Czech Republic" },
+  { code: "DK", name: "Denmark" },
+  { code: "EE", name: "Estonia" },
+  { code: "FI", name: "Finland" },
+  { code: "FR", name: "France" },
+  { code: "DE", name: "Germany" },
+  { code: "GR", name: "Greece" },
+  { code: "HU", name: "Hungary" },
+  { code: "IS", name: "Iceland" },
+  { code: "IT", name: "Italy" },
+  { code: "LV", name: "Latvia" },
+  { code: "LI", name: "Liechtenstein" },
+  { code: "LT", name: "Lithuania" },
+  { code: "LU", name: "Luxembourg" },
+  { code: "MT", name: "Malta" },
+  { code: "NL", name: "Netherlands" },
+  { code: "NO", name: "Norway" },
+  { code: "PL", name: "Poland" },
+  { code: "PT", name: "Portugal" },
+  { code: "SK", name: "Slovakia" },
+  { code: "SI", name: "Slovenia" },
+  { code: "ES", name: "Spain" },
+  { code: "SE", name: "Sweden" },
+  { code: "CH", name: "Switzerland" },
 ];
 
-const countryOptions = schengenCountries.map((code) => ({
-  value: code,
-  label: countries.getName(code, "en"),
-}));
-
 interface CountryDropdownProps {
-  onChange: (countryCode: string) => void;
+  onChange: (countryName: string) => void;
   value: string | null;
 }
 
-const CountryDropdown: React.FC<CountryDropdownProps> = ({
-  onChange,
-  value,
-}) => {
+const CountryDropdown: FC<CountryDropdownProps> = ({ onChange, value }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleToggle = () => setIsOpen(!isOpen);
 
-  const handleSelect = (countryCode: string) => {
-    onChange(countryCode);
+  const handleSelect = (countryName: string) => {
+    onChange(countryName);
     setIsOpen(false);
   };
 
@@ -69,9 +57,15 @@ const CountryDropdown: React.FC<CountryDropdownProps> = ({
           {value ? (
             <>
               <div className={classes["dropdown-flag"]}>
-                <Flag countryCode={value} svg />
+                <Flag
+                  countryCode={
+                    schengenCountries.find((country) => country.name === value)
+                      ?.code || ""
+                  }
+                  svg
+                />
               </div>
-              {countries.getName(value, "en")}
+              {value}
             </>
           ) : (
             "Select a country"
@@ -89,17 +83,16 @@ const CountryDropdown: React.FC<CountryDropdownProps> = ({
       </div>
       {isOpen && (
         <ul className={classes["dropdown-menu"]}>
-          {countryOptions.map((country) => (
+          {schengenCountries.map((country) => (
             <li
-              key={country.value}
-              onClick={() => handleSelect(country.value)}
+              key={country.code}
+              onClick={() => handleSelect(country.name)}
               className={classes["dropdown-item"]}
             >
               <div className={classes["dropdown-flag"]}>
-                <Flag countryCode={country.value} svg />
+                <Flag countryCode={country.code} svg />
               </div>
-
-              {country.label}
+              {country.name}
             </li>
           ))}
         </ul>
