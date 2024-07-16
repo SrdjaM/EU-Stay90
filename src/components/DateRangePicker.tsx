@@ -13,6 +13,7 @@ import { UI_TEXT } from "../common/constants/constants";
 import { useToast } from "../contexts/ToastContext";
 import classes from "../styles/DateRangePicker.module.scss";
 import { useDateRangePicker } from "../custom/hooks/useDateRangePicker";
+import SaveButton from "./SaveButton";
 
 const TO_PREVIOUS_MONTH = -1;
 const TO_NEXT_MONTH = 1;
@@ -149,36 +150,24 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   };
 
   const handleConfirmDates = async () => {
-    try {
-      if (state.inputStartDate && state.inputEndDate) {
-        const isValidStartDate = isValidDate(state.inputStartDate);
-        const isValidEndDate = isValidDate(state.inputEndDate);
+    if (state.inputStartDate && state.inputEndDate) {
+      const isValidStartDate = isValidDate(state.inputStartDate);
+      const isValidEndDate = isValidDate(state.inputEndDate);
 
-        if (!isValidStartDate || !isValidEndDate) {
-          throw new Error("Wrong date input");
-        }
-
-        const startDateISO = new Date(state.inputStartDate).toISOString();
-        const endDateISO = new Date(state.inputEndDate).toISOString();
-
-        const newTrip = {
-          userId: userId || "",
-          startDate: startDateISO,
-          endDate: endDateISO,
-        };
-
-        await addDoc(collection(db, "trips"), newTrip);
-
-        addToast("Trip added successfully!", "success");
-
-        cancelSelectedDates();
+      if (!isValidStartDate || !isValidEndDate) {
+        throw new Error("Wrong date input");
       }
-    } catch (error) {
-      if (error instanceof Error) {
-        addToast(`Failed to add trip: ${error.message}`, "error");
-      } else {
-        addToast("Failed to add trip due to an unknown error.", "error");
-      }
+
+      const startDateISO = new Date(state.inputStartDate).toISOString();
+      const endDateISO = new Date(state.inputEndDate).toISOString();
+
+      const newTrip = {
+        userId: userId || "",
+        startDate: startDateISO,
+        endDate: endDateISO,
+      };
+
+      await addDoc(collection(db, "trips"), newTrip);
     }
   };
 
@@ -235,9 +224,16 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
         {!isInEdit && (
           <>
             <div className={classes["btn-container"]}>
-              <Button onClick={handleConfirmDates} variant="primary">
+              <SaveButton
+                onClick={handleConfirmDates}
+                variant="primary"
+                isDisabled={!state.inputStartDate || !state.inputEndDate}
+                onComplete={cancelSelectedDates}
+                onSuccess={"Trip added successfully!"}
+                onError={"Failed to add trip"}
+              >
                 {UI_TEXT.CONFIRM}
-              </Button>
+              </SaveButton>
             </div>
             <div className={classes["btn-container"]}>
               <Button onClick={handleCancelDates} variant="primary">

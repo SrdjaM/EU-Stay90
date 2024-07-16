@@ -3,11 +3,11 @@ import { Trip } from "./TripList";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
 
-import { useToast } from "../contexts/ToastContext";
 import Button from "./Button";
 import classes from "../styles/EditTripModal.module.scss";
 import DateRangePicker from "./DateRangePicker";
 import { useDate } from "../contexts/DateContext";
+import SaveButton from "./SaveButton";
 
 interface EditTripModalProps {
   trip: Trip;
@@ -31,36 +31,18 @@ const EditTripModal: React.FC<EditTripModalProps> = ({
     return localDate.toISOString().split("T")[0];
   };
 
-  const addToast = useToast();
-
   const handleOnClose = () => {
     onClose();
     cancelSelectedDates();
   };
 
   const handleSave = async () => {
-    try {
-      if (!startDate || !endDate) {
-        addToast("Start date and end date cannot be empty.", "error");
-        return;
-      }
+    const tripRef = doc(db, "trips", tripId);
 
-      const tripRef = doc(db, "trips", tripId);
-
-      await updateDoc(tripRef, {
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString(),
-      });
-
-      handleOnClose();
-      addToast("Trip edited successfully ", "success");
-    } catch (error: any) {
-      if (error instanceof Error) {
-        addToast(`Failed to edit trip: ${error.message}`, "error");
-      } else {
-        addToast("Failed to edit trip due to an unknown error.", "error");
-      }
-    }
+    await updateDoc(tripRef, {
+      startDate: startDate && startDate.toISOString(),
+      endDate: endDate && endDate.toISOString(),
+    });
   };
 
   return (
@@ -74,9 +56,16 @@ const EditTripModal: React.FC<EditTripModalProps> = ({
         />
         <div className={classes["modal-content_separator"]}></div>
         <div className={classes["btn_container"]}>
-          <Button variant="primary" onClick={handleSave}>
+          <SaveButton
+            variant="primary"
+            onClick={handleSave}
+            isDisabled={!startDate || !endDate}
+            onComplete={handleOnClose}
+            onSuccess={"Trip edited successfully!"}
+            onError={"Failed to edit trip!"}
+          >
             Save
-          </Button>
+          </SaveButton>
           <Button variant="primary" onClick={handleOnClose}>
             Cancel
           </Button>
