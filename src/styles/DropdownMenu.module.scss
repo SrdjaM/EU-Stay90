@@ -3,12 +3,11 @@
 @import "mixins";
 @import "breakpoints";
 
-.dropdown_container {
-  cursor: pointer;
-}
-
 .dropdown_toggle {
-  width: 0.75rem;
+  border: none;
+  background-color: $white-color;
+  margin: 0;
+  cursor: pointer;
 }
 
 .dropdown_menu {
@@ -20,14 +19,19 @@
 }
 
 .dropdown_item {
+  border: none;
   border-bottom: $thick-border--light;
   padding: $spacing-xs;
   display: flex;
   align-items: center;
+  margin: 0;
+  width: 100%;
   cursor: pointer;
   font-weight: $bold-fontweight;
+  background-color: $white-color;
   &:hover {
     color: $gray-dark--1;
+    background-color: $gray-light--3;
   }
 }
 

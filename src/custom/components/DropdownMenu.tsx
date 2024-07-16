@@ -25,7 +25,7 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
   onToggle,
   position,
 }) => {
-  const toggleRef = useRef<HTMLDivElement | null>(null);
+  const toggleRef = useRef<HTMLButtonElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
 
   const [style, setStyle] = useState({ top: 0, left: 0 });
@@ -63,15 +63,6 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
     }
   }, [isOpen, position]);
 
-  const handleKeyDown = (
-    e: KeyboardEvent<HTMLDivElement>,
-    action: () => void
-  ) => {
-    if (e.key === "Enter") {
-      action();
-    }
-  };
-
   const dropdownMenu = (
     <div
       className={classes["dropdown_menu"]}
@@ -79,36 +70,34 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
       style={{ top: style.top, left: style.left }}
     >
       {items.map((item, index) => (
-        <div
+        <button
           className={classes["dropdown_item"]}
           key={index}
           onClick={item.action}
-          tabIndex={0}
-          onKeyDown={(e) => handleKeyDown(e, item.action)}
+          autoFocus={index === 0}
         >
           <span className={classes["item_text"]}>{item.text}</span>
           <FontAwesomeIcon
             icon={item.icon as any}
             className={classes["dropdown_icon"]}
           />
-        </div>
+        </button>
       ))}
     </div>
   );
 
   return (
-    <div className={classes["dropdown_container"]}>
-      <div
+    <>
+      <button
+        type="button"
         ref={toggleRef}
         className={classes["dropdown_toggle"]}
         onClick={onToggle}
-        tabIndex={0}
-        onKeyDown={(e) => handleKeyDown(e, onToggle)}
       >
         <FontAwesomeIcon icon={faEllipsisV} />
-      </div>
+      </button>
       {isOpen && createPortal(dropdownMenu, document.body)}
-    </div>
+    </>
   );
 };
 

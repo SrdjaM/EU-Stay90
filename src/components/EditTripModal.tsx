@@ -70,7 +70,7 @@ const EditTripModal: React.FC<EditTripModalProps> = ({
         <DateRangePicker
           initialStartDate={toLocalDateString(trip.startDate)}
           initialEndDate={toLocalDateString(trip.endDate)}
-          isInEdit={true}
+          isInEdit
         />
         <div className={classes["modal-content_separator"]}></div>
         <div className={classes["btn_container"]}>

@@ -14,7 +14,7 @@ export const reducer = (
 ): TripListState => {
   switch (action.type) {
     case TripListActionTypes.SET_TRIPS:
-      return { ...state, trips: action.payload };
+      return { ...state, trips: action.payload, loading: false };
     case TripListActionTypes.SET_LOADING:
       return { ...state, loading: action.payload };
     case TripListActionTypes.SET_EDIT_TRIP_ID:

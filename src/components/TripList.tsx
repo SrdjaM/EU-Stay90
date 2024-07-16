@@ -146,7 +146,6 @@ const TripList: React.FC = () => {
         tripsData.sort((a, b) => b.startDate.getTime() - a.startDate.getTime());
 
         dispatch({ type: TripListActionTypes.SET_TRIPS, payload: tripsData });
-        dispatch({ type: TripListActionTypes.SET_LOADING, payload: false });
       },
       (error) => {
         addToast(error.message, "error");
