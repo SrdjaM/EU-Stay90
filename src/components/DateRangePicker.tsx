@@ -148,25 +148,23 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   };
 
   const handleConfirmDates = async () => {
-    if (state.inputStartDate && state.inputEndDate) {
-      const isValidStartDate = isValidDate(state.inputStartDate);
-      const isValidEndDate = isValidDate(state.inputEndDate);
+    const isValidStartDate = isValidDate(state.inputStartDate);
+    const isValidEndDate = isValidDate(state.inputEndDate);
 
-      if (!isValidStartDate || !isValidEndDate) {
-        throw new Error("Wrong date input");
-      }
-
-      const startDateISO = new Date(state.inputStartDate).toISOString();
-      const endDateISO = new Date(state.inputEndDate).toISOString();
-
-      const newTrip = {
-        userId: userId || "",
-        startDate: startDateISO,
-        endDate: endDateISO,
-      };
-
-      await addDoc(collection(db, "trips"), newTrip);
+    if (!isValidStartDate || !isValidEndDate) {
+      throw new Error("Wrong date input");
     }
+
+    const startDateISO = new Date(state.inputStartDate).toISOString();
+    const endDateISO = new Date(state.inputEndDate).toISOString();
+
+    const newTrip = {
+      userId: userId || "",
+      startDate: startDateISO,
+      endDate: endDateISO,
+    };
+
+    await addDoc(collection(db, "trips"), newTrip);
   };
 
   const currentMonthDays = generateDaysInMonth(currentYear, currentMonth, true);
