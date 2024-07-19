@@ -204,7 +204,6 @@
 }
 
 .disabled-day {
-  pointer-events: none;
   &:not(.in-range) {
     opacity: 0.5;
   }

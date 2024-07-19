@@ -19,7 +19,7 @@
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 999;
+  z-index: $z-index-ref;
   visibility: hidden;
   transform: translateX(100%);
   transition: transform 0.3s ease;
@@ -37,7 +37,7 @@
   position: fixed;
   bottom: 1.5rem;
   right: 1.5rem;
-  z-index: 999;
+  z-index: $z-index-ref;
 }
 
 .btn_add--icon-style {
@@ -50,7 +50,7 @@
   position: fixed;
   right: -2rem;
   top: 1rem;
-  z-index: 1000;
+  z-index: $z-index-ref + 1;
   transition: all 0.3s ease;
   cursor: pointer;
   visibility: hidden;

@@ -159,7 +159,7 @@
   min-width: 8.5rem;
   text-align: start;
   @include breakpoint-sm-to-md-and-lower {
-    min-width: none;
+    min-width: unset;
   }
 }
 
@@ -168,7 +168,7 @@
   text-align: end;
   margin-right: $spacing-lg;
   @include breakpoint-sm-to-md-and-lower {
-    min-width: none;
+    min-width: unset;
     text-align: start;
   }
 }

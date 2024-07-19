@@ -83,7 +83,6 @@ export const useDateRangePicker = () => {
     endDate,
     setStartDate,
     setEndDate,
-    selectedDay,
     handleDayClick,
     cancelSelectedDates,
   } = useDate();
@@ -186,7 +185,6 @@ export const useDateRangePicker = () => {
     getNextMonthAndYear,
     handleDayClick,
     generateDaysInMonth,
-    selectedDay,
     isValidDate,
   };
 };

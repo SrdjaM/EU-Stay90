@@ -10,10 +10,9 @@ import { useDate } from "../contexts/DateContext";
 import RoundButton from "../custom/components/RoundButton";
 import { months, daysOfWeek } from "../common/constants/constants";
 import { UI_TEXT } from "../common/constants/constants";
-import { useToast } from "../contexts/ToastContext";
-import classes from "../styles/DateRangePicker.module.scss";
 import { useDateRangePicker } from "../custom/hooks/useDateRangePicker";
 import SaveButton from "./SaveButton";
+import classes from "../styles/DateRangePicker.module.scss";
 
 const TO_PREVIOUS_MONTH = -1;
 const TO_NEXT_MONTH = 1;
@@ -39,8 +38,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   initialEndDate,
   isInEdit,
 }) => {
-  const { setStartDate, setEndDate } = useDate();
-  const addToast = useToast();
+  const { setStartDate, setEndDate, startDate, endDate } = useDate();
 
   const startDateRef = useRef<HTMLInputElement>(null);
   const endDateRef = useRef<HTMLInputElement>(null);
@@ -63,7 +61,6 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
     getNextMonthAndYear,
     handleDayClick,
     generateDaysInMonth,
-    selectedDay,
     isValidDate,
   } = useDateRangePicker();
 
@@ -108,15 +105,16 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
         }
       };
 
+      const isSelectedDate =
+        (day.date && startDate && day.date.getTime() === startDate.getTime()) ||
+        (day.date && endDate && day.date.getTime() === endDate.getTime());
+
       const dayClasses = classNames(classes["days-grid__day"], {
         [classes["days-grid__day--previous-month"]]: day.date === null,
         [classes["in-range"]]: day.isInRange,
-        [classes["selected-day"]]:
-          day.date &&
-          selectedDay &&
-          day.date.getTime() === selectedDay.getTime(),
+        [classes["selected-day"]]: isSelectedDate,
         [classes["disabled-day"]]:
-          selectedDay && day.date && day.date < selectedDay,
+          !isSelectedDate && startDate && day.date && day.date < startDate,
       });
 
       return (
