@@ -106,8 +106,9 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
       };
 
       const isSelectedDate =
-        (day.date && startDate && day.date.getTime() === startDate.getTime()) ||
-        (day.date && endDate && day.date.getTime() === endDate.getTime());
+        day.date !== null &&
+        (day.date?.getTime() === startDate?.getTime() ||
+          day.date?.getTime() === endDate?.getTime());
 
       const dayClasses = classNames(classes["days-grid__day"], {
         [classes["days-grid__day--previous-month"]]: day.date === null,

@@ -30,7 +30,9 @@ const SaveButton: React.FC<SaveButtonProps> = ({
     setLoading(true);
     try {
       await onClick();
-      if (onSuccess) addToast(onSuccess, "success");
+      if (onSuccess) {
+        addToast(onSuccess, "success");
+      }
       onComplete();
     } catch (error: any) {
       let errorMessage = onError || "An error occured!";
