@@ -226,8 +226,8 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
                 variant="primary"
                 isDisabled={!state.inputStartDate || !state.inputEndDate}
                 onComplete={cancelSelectedDates}
-                onSuccess={"Trip added successfully!"}
-                onError={"Failed to add trip"}
+                onSuccess="Trip added successfully!"
+                onError="Failed to add trip"
               >
                 {UI_TEXT.CONFIRM}
               </SaveButton>
