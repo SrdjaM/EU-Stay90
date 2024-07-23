@@ -204,7 +204,6 @@
 }
 
 .disabled-day {
-  pointer-events: none;
   &:not(.in-range) {
     opacity: 0.5;
   }
@@ -217,6 +216,10 @@
 .btn-action {
   display: flex;
   margin-bottom: $spacing-lg;
+}
+
+.modal {
+  height: auto;
 }
 
 .btn-action .btn-container:first-child {

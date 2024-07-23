@@ -127,6 +127,7 @@
   margin-bottom: $spacing-xs;
   color: $black-color;
   font-weight: $bold-fontweight;
+  position: relative;
 
   @include breakpoint-md-and-lower {
     font-size: $font-sm;
@@ -150,6 +151,7 @@
     grid-column-start: 2;
     grid-column-end: 3;
     grid-row: auto / span 2;
+    margin-right: $spacing-m;
   }
 }
 
@@ -157,15 +159,40 @@
   min-width: 8.5rem;
   text-align: start;
   @include breakpoint-sm-to-md-and-lower {
-    min-width: none;
+    min-width: unset;
   }
 }
 
 .trip_end-date {
   min-width: 8.5rem;
   text-align: end;
+  margin-right: $spacing-lg;
   @include breakpoint-sm-to-md-and-lower {
-    min-width: none;
+    min-width: unset;
     text-align: start;
   }
+}
+
+.edit-delete_container {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-xs;
+  border-left: none;
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translate(0, -50%);
+}
+
+.edit_container,
+.delete_container {
+  cursor: pointer;
+}
+
+.edit_container {
+  margin-right: $spacing-sm;
+}
+
+.delete_container {
+  color: $error-color;
 }

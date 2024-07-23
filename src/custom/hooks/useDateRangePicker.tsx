@@ -2,8 +2,8 @@ import { useEffect, useReducer } from "react";
 import * as yup from "yup";
 
 import { useMonthYear } from "./useMonthYear";
-import { useDateSelection } from "./useDateSelection";
 import { useToast } from "../../contexts/ToastContext";
+import { useDate } from "../../contexts/DateContext";
 
 const FIRST_DAY_OF_WEEK_INDEX = 0;
 const LAST_DAY_OF_WEEK_INDEX = 7;
@@ -81,10 +81,11 @@ export const useDateRangePicker = () => {
   const {
     startDate,
     endDate,
-    selectedDay,
+    setStartDate,
+    setEndDate,
     handleDayClick,
     cancelSelectedDates,
-  } = useDateSelection();
+  } = useDate();
   const addToast = useToast();
 
   useEffect(() => {
@@ -103,11 +104,15 @@ export const useDateRangePicker = () => {
     type: "SET_START_DATE" | "SET_END_DATE"
   ) => {
     const value = e.target.value;
-    const date = new Date(value);
-    dispatch({ type: type, payload: value });
+    dispatch({ type, payload: value });
 
-    if (!isNaN(date.getTime()) && isValidDate(value)) {
-      handleDayClick(date);
+    if (isValidDate(value)) {
+      const date = new Date(value);
+      if (type === "SET_START_DATE") {
+        setStartDate(date);
+      } else {
+        setEndDate(date);
+      }
     }
   };
 
@@ -180,7 +185,6 @@ export const useDateRangePicker = () => {
     getNextMonthAndYear,
     handleDayClick,
     generateDaysInMonth,
-    selectedDay,
     isValidDate,
   };
 };

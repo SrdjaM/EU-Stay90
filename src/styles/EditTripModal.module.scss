@@ -1,0 +1,91 @@
+@import "colors.scss";
+@import "_variables";
+@import "mixins";
+@import "breakpoints";
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: $z-index-modal;
+  overflow-y: scroll;
+  @include flex-center();
+}
+
+.modal_content {
+  background-color: $white-color;
+  padding: $spacing-m;
+  border-radius: $border-radius-s;
+  text-align: center;
+  min-width: 18rem;
+
+  @include breakpoint-md-and-lower {
+    width: 100%;
+    padding: 0;
+    height: 100%;
+  }
+}
+
+.modal_heading {
+  color: $gray-dark--1;
+  text-transform: uppercase;
+
+  @include breakpoint-md-and-lower {
+    margin-bottom: -1rem;
+  }
+}
+
+.edit-input_label {
+  display: block;
+  margin-bottom: $spacing-sm;
+  color: $gray-light--1;
+  text-transform: uppercase;
+  @include typography-sm-2;
+}
+
+.edit-input {
+  display: block;
+  margin: $spacing-sm auto $spacing-ml auto;
+  padding: $spacing-sm;
+  border: $thick-border--light;
+  border-radius: $border-radius-xs;
+  color: $gray-light--1;
+  font-weight: $bold-fontweight;
+  &::-webkit-inner-spin-button {
+    display: none;
+  }
+
+  &::-webkit-calendar-picker-indicator {
+    display: none;
+  }
+}
+
+button {
+  margin: 0 10px;
+}
+
+.btn_container {
+  display: flex;
+  justify-content: center;
+  margin-top: $spacing-lg;
+
+  @include breakpoint-md-and-lower {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: $spacing-sm $spacing-sm 0 $spacing-sm;
+    background-color: $white-color;
+    box-shadow: $box-shadow-top;
+    z-index: $z-index-modal + 1;
+  }
+}
+
+.modal-content_separator {
+  @include breakpoint-md-and-lower {
+    height: 1.5rem;
+  }
+}

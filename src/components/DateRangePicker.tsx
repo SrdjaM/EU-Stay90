@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
 import { db } from "../firebase";
 import { addDoc, collection } from "firebase/firestore";
@@ -6,12 +6,13 @@ import { useUser } from "../contexts/UserContext";
 import classNames from "classnames";
 
 import Button from "./Button";
+import { useDate } from "../contexts/DateContext";
 import RoundButton from "../custom/components/RoundButton";
 import { months, daysOfWeek } from "../common/constants/constants";
 import { UI_TEXT } from "../common/constants/constants";
-import { useToast } from "../contexts/ToastContext";
-import classes from "../styles/DateRangePicker.module.scss";
 import { useDateRangePicker } from "../custom/hooks/useDateRangePicker";
+import SaveButton from "./SaveButton";
+import classes from "../styles/DateRangePicker.module.scss";
 
 const TO_PREVIOUS_MONTH = -1;
 const TO_NEXT_MONTH = 1;
@@ -26,13 +27,29 @@ interface Day {
   isInRange?: boolean;
 }
 
-const DateRangePicker: React.FC = () => {
-  const addToast = useToast();
+interface DateRangePickerProps {
+  initialStartDate?: string;
+  initialEndDate?: string;
+  isInEdit?: boolean;
+}
+
+const DateRangePicker: React.FC<DateRangePickerProps> = ({
+  initialStartDate,
+  initialEndDate,
+  isInEdit,
+}) => {
+  const { setStartDate, setEndDate, startDate, endDate } = useDate();
 
   const startDateRef = useRef<HTMLInputElement>(null);
   const endDateRef = useRef<HTMLInputElement>(null);
 
   const { userId } = useUser();
+
+  useEffect(() => {
+    if (initialStartDate) setStartDate(new Date(initialStartDate));
+    if (initialEndDate) setEndDate(new Date(initialEndDate));
+  }, [initialStartDate, initialEndDate]);
+
   const {
     state,
     handleDateChange,
@@ -44,7 +61,6 @@ const DateRangePicker: React.FC = () => {
     getNextMonthAndYear,
     handleDayClick,
     generateDaysInMonth,
-    selectedDay,
     isValidDate,
   } = useDateRangePicker();
 
@@ -89,15 +105,17 @@ const DateRangePicker: React.FC = () => {
         }
       };
 
+      const isSelectedDate =
+        day.date !== null &&
+        (day.date?.getTime() === startDate?.getTime() ||
+          day.date?.getTime() === endDate?.getTime());
+
       const dayClasses = classNames(classes["days-grid__day"], {
         [classes["days-grid__day--previous-month"]]: day.date === null,
         [classes["in-range"]]: day.isInRange,
-        [classes["selected-day"]]:
-          day.date &&
-          selectedDay &&
-          day.date.getTime() === selectedDay.getTime(),
+        [classes["selected-day"]]: isSelectedDate,
         [classes["disabled-day"]]:
-          selectedDay && day.date && day.date < selectedDay,
+          !isSelectedDate && startDate && day.date && day.date < startDate,
       });
 
       return (
@@ -131,41 +149,31 @@ const DateRangePicker: React.FC = () => {
   };
 
   const handleConfirmDates = async () => {
-    try {
-      if (state.inputStartDate && state.inputEndDate) {
-        const isValidStartDate = isValidDate(state.inputStartDate);
-        const isValidEndDate = isValidDate(state.inputEndDate);
+    const isValidStartDate = isValidDate(state.inputStartDate);
+    const isValidEndDate = isValidDate(state.inputEndDate);
 
-        if (!isValidStartDate || !isValidEndDate) {
-          throw new Error("Wrong date input");
-        }
-
-        const startDateISO = new Date(state.inputStartDate).toISOString();
-        const endDateISO = new Date(state.inputEndDate).toISOString();
-
-        const newTrip = {
-          userId: userId || "",
-          startDate: startDateISO,
-          endDate: endDateISO,
-        };
-
-        await addDoc(collection(db, "trips"), newTrip);
-
-        addToast("Trip added successfully!", "success");
-
-        cancelSelectedDates();
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        addToast(`Failed to add trip: ${error.message}`, "error");
-      } else {
-        addToast("Failed to add trip due to an unknown error.", "error");
-      }
+    if (!isValidStartDate || !isValidEndDate) {
+      throw new Error("Wrong date input");
     }
+
+    const startDateISO = new Date(state.inputStartDate).toISOString();
+    const endDateISO = new Date(state.inputEndDate).toISOString();
+
+    const newTrip = {
+      userId: userId || "",
+      startDate: startDateISO,
+      endDate: endDateISO,
+    };
+
+    await addDoc(collection(db, "trips"), newTrip);
   };
 
   const currentMonthDays = generateDaysInMonth(currentYear, currentMonth, true);
   const nextMonthDays = generateDaysInMonth(nextYear, nextMonth, true);
+
+  const dateRangeClass = classNames(classes["date-range"], {
+    [classes.modal]: isInEdit,
+  });
 
   const handleCancelDates = () => {
     cancelSelectedDates();
@@ -174,7 +182,7 @@ const DateRangePicker: React.FC = () => {
   };
 
   return (
-    <div className={classes["date-range"]}>
+    <div className={dateRangeClass}>
       <div className={classes["picked-date"]}>
         {state.inputStartDate && (
           <span className={classes["picked-date__start-day--span"]}>
@@ -210,16 +218,27 @@ const DateRangePicker: React.FC = () => {
         {state.inputDateError && <span>{state.inputDateError}</span>}
       </div>
       <div className={classes["btn-action"]}>
-        <div className={classes["btn-container"]}>
-          <Button onClick={handleConfirmDates} variant="primary">
-            {UI_TEXT.CONFIRM}
-          </Button>
-        </div>
-        <div className={classes["btn-container"]}>
-          <Button onClick={handleCancelDates} variant="primary">
-            {UI_TEXT.CANCEL}
-          </Button>
-        </div>
+        {!isInEdit && (
+          <>
+            <div className={classes["btn-container"]}>
+              <SaveButton
+                onClick={handleConfirmDates}
+                variant="primary"
+                isDisabled={!state.inputStartDate || !state.inputEndDate}
+                onComplete={cancelSelectedDates}
+                onSuccess="Trip added successfully!"
+                onError="Failed to add trip"
+              >
+                {UI_TEXT.CONFIRM}
+              </SaveButton>
+            </div>
+            <div className={classes["btn-container"]}>
+              <Button onClick={handleCancelDates} variant="primary">
+                {UI_TEXT.CANCEL}
+              </Button>
+            </div>
+          </>
+        )}
       </div>
       <div className={classes["date-range__days"]}>
         <div>
