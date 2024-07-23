@@ -5,15 +5,20 @@ import classes from "../styles/HomePage.module.scss";
 import RoundButton from "../custom/components/RoundButton";
 import { faX } from "@fortawesome/free-solid-svg-icons";
 import { faCalendarPlus } from "@fortawesome/free-regular-svg-icons";
+import { useDate } from "../contexts/DateContext";
 
 const HomePage: React.FC = () => {
   const [openDateRange, setOpenDateRange] = useState(false);
 
+  const { cancelSelectedDates } = useDate();
+
   const openDateRangeHandler = () => {
     setOpenDateRange(true);
+    cancelSelectedDates();
   };
   const closeDateRangeHandler = () => {
     setOpenDateRange(false);
+    cancelSelectedDates();
   };
   const addVisibleClass = () => openDateRange && classes.visible;
 

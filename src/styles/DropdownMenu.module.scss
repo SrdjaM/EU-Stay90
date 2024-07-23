@@ -1,0 +1,44 @@
+@import "colors.scss";
+@import "_variables";
+@import "mixins";
+@import "breakpoints";
+
+.dropdown_toggle {
+  border: none;
+  background-color: $white-color;
+  margin: 0;
+  cursor: pointer;
+}
+
+.dropdown_menu {
+  position: absolute;
+  color: $gray-light--1;
+  border: $thick-border--light;
+  border-radius: $border-radius-xs;
+  background-color: $white-color;
+}
+
+.dropdown_item {
+  border: none;
+  border-bottom: $thick-border--light;
+  padding: $spacing-xs;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  width: 100%;
+  cursor: pointer;
+  font-weight: $bold-fontweight;
+  background-color: $white-color;
+  &:hover {
+    color: $gray-dark--1;
+    background-color: $gray-light--3;
+  }
+}
+
+.item_text {
+  text-transform: capitalize;
+}
+
+.dropdown_icon {
+  margin-left: $spacing-xs;
+}

@@ -1,26 +1,43 @@
-import React, { useEffect, useState } from "react";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+import React, { useEffect, useReducer } from "react";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  query,
+  where,
+} from "firebase/firestore";
 import { db } from "../firebase";
 import { useUser } from "../contexts/UserContext";
 import ReactCountryFlag from "react-country-flag";
+import { faEdit, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 
 import { formatDate } from "../custom/utils/dateUtils";
 import classes from "../styles/TripList.module.scss";
 import { months } from "../common/constants/constants";
 import Loader from "../custom/components/Loader";
 import { schengenCountries } from "../common/constants/constants";
+import EditTripModal from "./EditTripModal";
+import DropdownMenu from "../custom/components/DropdownMenu";
+import { TripListActionTypes } from "../common/enums/ActionTypes";
+import { initialState, reducer } from "../common/hooks/tripListReducer";
+import { useToast } from "../contexts/ToastContext";
+import { Position } from "../common/enums/Position";
 
 const DAYS_AVAILABLE_IN_EU = 90;
 
 export interface Trip {
+  id: string;
   startDate: Date;
   endDate: Date;
   country: string;
 }
 
 const TripList: React.FC = () => {
-  const [trips, setTrips] = useState<Trip[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  const addToast = useToast();
+
   const { userId } = useUser();
 
   const countDays = (trip: Trip) => {
@@ -30,13 +47,13 @@ const TripList: React.FC = () => {
   };
 
   const filterTripsLast180Days = () => {
-    if (trips.length === 0) return [];
+    if (state.trips.length === 0) return [];
 
-    const lastTrip = trips[0];
+    const lastTrip = state.trips[0];
     const last180DaysDate = new Date(lastTrip.endDate);
     last180DaysDate.setDate(lastTrip.endDate.getDate() - 180);
 
-    return trips.filter(
+    return state.trips.filter(
       (trip) =>
         trip.startDate >= last180DaysDate && trip.endDate <= lastTrip.endDate
     );
@@ -45,6 +62,32 @@ const TripList: React.FC = () => {
   const getTotalDays = () => {
     const last180DaysTrips = filterTripsLast180Days();
     return last180DaysTrips.reduce((total, trip) => total + countDays(trip), 0);
+  };
+
+  const getDropdownItems = (tripId: string) => [
+    {
+      icon: faEdit,
+      text: "Edit",
+      action: () =>
+        dispatch({
+          type: TripListActionTypes.SET_EDIT_TRIP_ID,
+          payload: tripId,
+        }),
+    },
+    {
+      icon: faTrashAlt,
+      text: "Delete",
+      action: () => handleDeleteTrip(tripId),
+    },
+  ];
+
+  const isDropdownOpened = (tripId: string) => state.openDropdownId === tripId;
+
+  const toggleDropdown = (tripId: string) => {
+    dispatch({
+      type: TripListActionTypes.SET_OPEN_DROPDOWN_ID,
+      payload: state.openDropdownId === tripId ? null : tripId,
+    });
   };
 
   const listItems = () => {
@@ -78,6 +121,14 @@ const TripList: React.FC = () => {
           <span className={classes["trip__total-days"]}>{`${countDays(
             trip
           )} days`}</span>
+          <div className={classes["edit-delete_container"]}>
+            <DropdownMenu
+              items={getDropdownItems(trip.id)}
+              isOpen={isDropdownOpened(trip.id)}
+              onToggle={() => toggleDropdown(trip.id)}
+              position={Position.BottomLeft}
+            />
+          </div>
         </div>
       </li>
     ));
@@ -98,7 +149,7 @@ const TripList: React.FC = () => {
   };
 
   useEffect(() => {
-    setLoading(true);
+    dispatch({ type: TripListActionTypes.SET_LOADING, payload: true });
     const q = query(collection(db, "trips"), where("userId", "==", userId));
     const unsubscribe = onSnapshot(
       q,
@@ -107,6 +158,7 @@ const TripList: React.FC = () => {
         querySnapshot.forEach((doc) => {
           const tripData = doc.data();
           tripsData.push({
+            id: doc.id,
             startDate: new Date(tripData.startDate),
             endDate: new Date(tripData.endDate),
             country: tripData.country,
@@ -114,21 +166,20 @@ const TripList: React.FC = () => {
         });
         tripsData.sort((a, b) => b.startDate.getTime() - a.startDate.getTime());
 
-        setTrips(tripsData);
-        setLoading(false);
+        dispatch({ type: TripListActionTypes.SET_TRIPS, payload: tripsData });
       },
       (error) => {
-        console.error("Error listening to trips updates:", error);
-        setLoading(false);
+        addToast(error.message, "error");
+        dispatch({ type: TripListActionTypes.SET_LOADING, payload: false });
       }
     );
     return () => unsubscribe();
   }, [userId]);
 
   const renderTripList = () => {
-    if (loading) {
+    if (state.loading) {
       return <Loader />;
-    } else if (trips.length > 0) {
+    } else if (state.trips.length > 0) {
       return <ul className={classes["trip-list__list"]}>{listItems()}</ul>;
     } else {
       return (
@@ -140,9 +191,9 @@ const TripList: React.FC = () => {
   };
 
   const getNextFull90Days = () => {
-    if (trips.length === 0) return new Date();
+    if (state.trips.length === 0) return new Date();
 
-    const lastTrip = trips[0];
+    const lastTrip = state.trips[0];
     const resetDate = new Date(lastTrip.endDate);
     resetDate.setDate(resetDate.getDate() + 180);
 
@@ -159,6 +210,23 @@ const TripList: React.FC = () => {
         <div>Next full 90 days date</div>
       </div>
     );
+  };
+
+  const handleDeleteTrip = async (tripId: string) => {
+    try {
+      await deleteDoc(doc(db, "trips", tripId));
+      addToast("Successfully deleted trip!", "success");
+    } catch (error) {
+      if (error instanceof Error) {
+        addToast(`Failed to delete trip: ${error.message}`, "error");
+      } else {
+        addToast("Failed to delete trip due to an unknown error.", "error");
+      }
+    }
+  };
+
+  const handleEditModalClose = () => {
+    dispatch({ type: TripListActionTypes.SET_EDIT_TRIP_ID, payload: null });
   };
 
   return (
@@ -186,6 +254,15 @@ const TripList: React.FC = () => {
         Your trips in last 180 days
       </h3>
       <div className={classes["trip-list__container"]}>{renderTripList()}</div>
+      {state.editTripId && (
+        <EditTripModal
+          trip={
+            state.trips.find((trip) => trip.id === state.editTripId) as Trip
+          }
+          tripId={state.editTripId}
+          onClose={handleEditModalClose}
+        />
+      )}
     </div>
   );
 };
