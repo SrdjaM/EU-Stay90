@@ -28,19 +28,27 @@ interface Day {
   isInRange?: boolean;
 }
 
-interface DateRangePickerProps {
+interface AddTripProps {
   initialStartDate?: string;
   initialEndDate?: string;
+  initialCountry?: string;
   isInEdit?: boolean;
 }
 
-const AddTrip: React.FC<DateRangePickerProps> = ({
+const AddTrip: React.FC<AddTripProps> = ({
   initialStartDate,
   initialEndDate,
+  initialCountry,
   isInEdit,
 }) => {
-  const { setStartDate, setEndDate, startDate, endDate } = useDate();
-  const [selectedCountry, setSelectedCountry] = useState<string>("");
+  const {
+    setStartDate,
+    setEndDate,
+    startDate,
+    endDate,
+    setSelectedCountry,
+    selectedCountry,
+  } = useDate();
 
   const startDateRef = useRef<HTMLInputElement>(null);
   const endDateRef = useRef<HTMLInputElement>(null);
@@ -48,15 +56,22 @@ const AddTrip: React.FC<DateRangePickerProps> = ({
   const { userId } = useUser();
 
   useEffect(() => {
-    if (initialStartDate) setStartDate(new Date(initialStartDate));
-    if (initialEndDate) setEndDate(new Date(initialEndDate));
-  }, [initialStartDate, initialEndDate]);
+    if (initialStartDate) {
+      setStartDate(new Date(initialStartDate));
+    }
+    if (initialEndDate) {
+      setEndDate(new Date(initialEndDate));
+    }
+    if (initialCountry) {
+      setSelectedCountry(initialCountry);
+    }
+  }, [initialStartDate, initialEndDate, initialCountry]);
 
   const {
     state,
     handleDateChange,
     handleDateBlur,
-    cancelSelectedDates,
+    cancelSelectedTrip,
     changeMonth,
     currentMonth,
     currentYear,
@@ -158,6 +173,10 @@ const AddTrip: React.FC<DateRangePickerProps> = ({
       throw new Error("Wrong date input");
     }
 
+    if (!selectedCountry) {
+      throw new Error("Please select a country");
+    }
+
     const startDateISO = new Date(state.inputStartDate).toISOString();
     const endDateISO = new Date(state.inputEndDate).toISOString();
 
@@ -169,7 +188,6 @@ const AddTrip: React.FC<DateRangePickerProps> = ({
     };
 
     await addDoc(collection(db, "trips"), newTrip);
-    setSelectedCountry("");
   };
 
   const currentMonthDays = generateDaysInMonth(currentYear, currentMonth, true);
@@ -180,7 +198,7 @@ const AddTrip: React.FC<DateRangePickerProps> = ({
   });
 
   const handleCancelDates = () => {
-    cancelSelectedDates();
+    cancelSelectedTrip();
     if (startDateRef.current) startDateRef.current.value = "";
     if (endDateRef.current) endDateRef.current.value = "";
   };
@@ -230,7 +248,7 @@ const AddTrip: React.FC<DateRangePickerProps> = ({
                 onClick={handleConfirmDates}
                 variant="primary"
                 isDisabled={!state.inputStartDate || !state.inputEndDate}
-                onComplete={cancelSelectedDates}
+                onComplete={cancelSelectedTrip}
                 onSuccess="Trip added successfully!"
                 onError="Failed to add trip"
               >

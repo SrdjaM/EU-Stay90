@@ -10,15 +10,15 @@ import { useDate } from "../contexts/DateContext";
 const HomePage: React.FC = () => {
   const [openDateRange, setOpenDateRange] = useState(false);
 
-  const { cancelSelectedDates } = useDate();
+  const { cancelSelectedTrip } = useDate();
 
   const openDateRangeHandler = () => {
     setOpenDateRange(true);
-    cancelSelectedDates();
+    cancelSelectedTrip();
   };
   const closeDateRangeHandler = () => {
     setOpenDateRange(false);
-    cancelSelectedDates();
+    cancelSelectedTrip();
   };
   const addVisibleClass = () => openDateRange && classes.visible;
 

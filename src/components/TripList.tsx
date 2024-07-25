@@ -95,32 +95,34 @@ const TripList: React.FC = () => {
     return last180DaysTrips.map((trip, index) => (
       <li key={index} className={classes["trip__list"]}>
         <div className={classes["trip__container"]}>
-          <div className={classes["trip_country"]}>
-            <div className={classes["trip_flag"]}>
-              <ReactCountryFlag
-                countryCode={
-                  schengenCountries.find(
-                    (country) => country.name === trip.country
-                  )?.code || ""
-                }
-                svg
-              />
+          <div className={classes["trip_details"]}>
+            <div className={classes["trip_country"]}>
+              <div className={classes["trip_flag"]}>
+                <ReactCountryFlag
+                  countryCode={
+                    schengenCountries.find(
+                      (country) => country.name === trip.country
+                    )?.code || ""
+                  }
+                  svg
+                />
+              </div>
+              <div className={classes["trip_country-name"]}>{trip.country}</div>
             </div>
-            <div className={classes["trip_country-name"]}>{trip.country}</div>
-          </div>
-          <div className={classes["trip_date"]}>
-            <span className={classes["trip__start-date"]}>
-              {formatDate(trip.startDate, months)}
-            </span>
-            -
-            <span className={classes["trip_end-date"]}>
-              {formatDate(trip.endDate, months)}
-            </span>
-          </div>
+            <div className={classes["trip_date"]}>
+              <span className={classes["trip__start-date"]}>
+                {formatDate(trip.startDate, months)}
+              </span>
+              -
+              <span className={classes["trip_end-date"]}>
+                {formatDate(trip.endDate, months)}
+              </span>
+            </div>
 
-          <span className={classes["trip__total-days"]}>{`${countDays(
-            trip
-          )} days`}</span>
+            <span className={classes["trip__total-days"]}>{`${countDays(
+              trip
+            )} days`}</span>
+          </div>
           <div className={classes["edit-delete_container"]}>
             <DropdownMenu
               items={getDropdownItems(trip.id)}

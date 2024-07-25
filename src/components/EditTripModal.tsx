@@ -5,7 +5,7 @@ import { db } from "../firebase";
 
 import Button from "./Button";
 import classes from "../styles/EditTripModal.module.scss";
-import DateRangePicker from "./DateRangePicker";
+import AddTrip from "./AddTrip";
 import { useDate } from "../contexts/DateContext";
 import SaveButton from "./SaveButton";
 
@@ -20,7 +20,7 @@ const EditTripModal: React.FC<EditTripModalProps> = ({
   tripId,
   onClose,
 }) => {
-  const { startDate, endDate, cancelSelectedDates } = useDate();
+  const { startDate, endDate, cancelSelectedTrip, selectedCountry } = useDate();
 
   const toLocalDateString = (date: Date) => {
     const localDate = new Date(date);
@@ -33,7 +33,7 @@ const EditTripModal: React.FC<EditTripModalProps> = ({
 
   const handleOnClose = () => {
     onClose();
-    cancelSelectedDates();
+    cancelSelectedTrip();
   };
 
   const handleSave = async () => {
@@ -42,6 +42,7 @@ const EditTripModal: React.FC<EditTripModalProps> = ({
     await updateDoc(tripRef, {
       startDate: startDate && startDate.toISOString(),
       endDate: endDate && endDate.toISOString(),
+      country: selectedCountry,
     });
   };
 
@@ -49,9 +50,10 @@ const EditTripModal: React.FC<EditTripModalProps> = ({
     <div className={classes.modal}>
       <div className={classes["modal_content"]}>
         <h2 className={classes["modal_heading"]}>Edit Trip</h2>
-        <DateRangePicker
+        <AddTrip
           initialStartDate={toLocalDateString(trip.startDate)}
           initialEndDate={toLocalDateString(trip.endDate)}
+          initialCountry={trip.country}
           isInEdit
         />
         <div className={classes["modal-content_separator"]}></div>

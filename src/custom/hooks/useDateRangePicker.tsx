@@ -84,7 +84,7 @@ export const useDateRangePicker = () => {
     setStartDate,
     setEndDate,
     handleDayClick,
-    cancelSelectedDates,
+    cancelSelectedTrip,
   } = useDate();
   const addToast = useToast();
 
@@ -178,7 +178,7 @@ export const useDateRangePicker = () => {
     state,
     handleDateChange,
     handleDateBlur,
-    cancelSelectedDates,
+    cancelSelectedTrip,
     changeMonth,
     currentMonth,
     currentYear,
