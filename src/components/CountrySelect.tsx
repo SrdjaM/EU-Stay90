@@ -60,6 +60,13 @@ const CountryDropdown: FC<CountryDropdownProps> = ({ onChange, value }) => {
               key={country.code}
               onClick={() => handleSelect(country.name)}
               className={classes["dropdown-item"]}
+              aria-selected={country.name === value}
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSelect(country.name);
+                }
+              }}
             >
               <div className={classes["dropdown-flag"]}>
                 <Flag countryCode={country.code} svg />
