@@ -56,15 +56,7 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: $spacing-sm;
-  @include breakpoint-lg-and-lower {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  @include breakpoint-md-and-lower {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  @include breakpoint-sm-to-md-and-lower {
-    grid-template-columns: 1fr;
-  }
+  @include responsive-grid(3, 2, 1);
 }
 
 .trip-list__header {
