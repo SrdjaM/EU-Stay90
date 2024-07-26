@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
 import { db } from "../firebase";
 import { addDoc, collection } from "firebase/firestore";
@@ -11,6 +11,7 @@ import RoundButton from "../custom/components/RoundButton";
 import { months, daysOfWeek } from "../common/constants/constants";
 import { UI_TEXT } from "../common/constants/constants";
 import { useDateRangePicker } from "../custom/hooks/useDateRangePicker";
+import CountrySelect from "./CountrySelect";
 import SaveButton from "./SaveButton";
 import classes from "../styles/DateRangePicker.module.scss";
 
@@ -27,18 +28,27 @@ interface Day {
   isInRange?: boolean;
 }
 
-interface DateRangePickerProps {
+interface AddTripProps {
   initialStartDate?: string;
   initialEndDate?: string;
+  initialCountry?: string;
   isInEdit?: boolean;
 }
 
-const DateRangePicker: React.FC<DateRangePickerProps> = ({
+const AddTrip: React.FC<AddTripProps> = ({
   initialStartDate,
   initialEndDate,
+  initialCountry,
   isInEdit,
 }) => {
-  const { setStartDate, setEndDate, startDate, endDate } = useDate();
+  const {
+    setStartDate,
+    setEndDate,
+    startDate,
+    endDate,
+    setSelectedCountry,
+    selectedCountry,
+  } = useDate();
 
   const startDateRef = useRef<HTMLInputElement>(null);
   const endDateRef = useRef<HTMLInputElement>(null);
@@ -46,15 +56,22 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   const { userId } = useUser();
 
   useEffect(() => {
-    if (initialStartDate) setStartDate(new Date(initialStartDate));
-    if (initialEndDate) setEndDate(new Date(initialEndDate));
-  }, [initialStartDate, initialEndDate]);
+    if (initialStartDate) {
+      setStartDate(new Date(initialStartDate));
+    }
+    if (initialEndDate) {
+      setEndDate(new Date(initialEndDate));
+    }
+    if (initialCountry) {
+      setSelectedCountry(initialCountry);
+    }
+  }, [initialStartDate, initialEndDate, initialCountry]);
 
   const {
     state,
     handleDateChange,
     handleDateBlur,
-    cancelSelectedDates,
+    cancelSelectedTrip,
     changeMonth,
     currentMonth,
     currentYear,
@@ -156,6 +173,10 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
       throw new Error("Wrong date input");
     }
 
+    if (!selectedCountry) {
+      throw new Error("Please select a country");
+    }
+
     const startDateISO = new Date(state.inputStartDate).toISOString();
     const endDateISO = new Date(state.inputEndDate).toISOString();
 
@@ -163,6 +184,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
       userId: userId || "",
       startDate: startDateISO,
       endDate: endDateISO,
+      country: selectedCountry,
     };
 
     await addDoc(collection(db, "trips"), newTrip);
@@ -176,7 +198,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   });
 
   const handleCancelDates = () => {
-    cancelSelectedDates();
+    cancelSelectedTrip();
     if (startDateRef.current) startDateRef.current.value = "";
     if (endDateRef.current) endDateRef.current.value = "";
   };
@@ -214,6 +236,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
           onBlur={() => handleDateBlur(state.inputEndDate)}
         />
       </div>
+      <CountrySelect value={selectedCountry} onChange={setSelectedCountry} />
       <div className={classes["input-error"]}>
         {state.inputDateError && <span>{state.inputDateError}</span>}
       </div>
@@ -225,7 +248,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
                 onClick={handleConfirmDates}
                 variant="primary"
                 isDisabled={!state.inputStartDate || !state.inputEndDate}
-                onComplete={cancelSelectedDates}
+                onComplete={cancelSelectedTrip}
                 onSuccess="Trip added successfully!"
                 onError="Failed to add trip"
               >
@@ -277,4 +300,4 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   );
 };
 
-export default DateRangePicker;
+export default AddTrip;

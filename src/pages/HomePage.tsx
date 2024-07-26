@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import DateRangePicker from "../components/DateRangePicker";
+import AddTrip from "../components/AddTrip";
 import TripList from "../components/TripList";
 import classes from "../styles/HomePage.module.scss";
 import RoundButton from "../custom/components/RoundButton";
@@ -10,15 +10,15 @@ import { useDate } from "../contexts/DateContext";
 const HomePage: React.FC = () => {
   const [openDateRange, setOpenDateRange] = useState(false);
 
-  const { cancelSelectedDates } = useDate();
+  const { cancelSelectedTrip } = useDate();
 
   const openDateRangeHandler = () => {
     setOpenDateRange(true);
-    cancelSelectedDates();
+    cancelSelectedTrip();
   };
   const closeDateRangeHandler = () => {
     setOpenDateRange(false);
-    cancelSelectedDates();
+    cancelSelectedTrip();
   };
   const addVisibleClass = () => openDateRange && classes.visible;
 
@@ -41,7 +41,7 @@ const HomePage: React.FC = () => {
       </div>
 
       <div className={`${classes["home-page__picker"]} ${addVisibleClass()}`}>
-        <DateRangePicker />
+        <AddTrip />
       </div>
       <div className={classes["home-page__trips"]}>
         <TripList />

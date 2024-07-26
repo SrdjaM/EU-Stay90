@@ -27,3 +27,15 @@
   justify-content: $justify;
   align-items: $align;
 }
+
+@mixin responsive-grid($lg-columns, $md-columns, $sm-columns) {
+  @include breakpoint-lg-and-lower {
+    grid-template-columns: repeat(#{$lg-columns}, 1fr);
+  }
+  @include breakpoint-md-and-lower {
+    grid-template-columns: repeat(#{$md-columns}, 1fr);
+  }
+  @include breakpoint-sm-to-md-and-lower {
+    grid-template-columns: repeat(#{$sm-columns}, 1fr);
+  }
+}

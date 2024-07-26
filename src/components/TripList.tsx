@@ -9,12 +9,14 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { useUser } from "../contexts/UserContext";
+import ReactCountryFlag from "react-country-flag";
 import { faEdit, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 
 import { formatDate } from "../custom/utils/dateUtils";
 import classes from "../styles/TripList.module.scss";
 import { months } from "../common/constants/constants";
 import Loader from "../custom/components/Loader";
+import { schengenCountries } from "../common/constants/constants";
 import EditTripModal from "./EditTripModal";
 import DropdownMenu from "../custom/components/DropdownMenu";
 import { TripListActionTypes } from "../common/enums/ActionTypes";
@@ -28,6 +30,7 @@ export interface Trip {
   id: string;
   startDate: Date;
   endDate: Date;
+  country: string;
 }
 
 const TripList: React.FC = () => {
@@ -92,15 +95,34 @@ const TripList: React.FC = () => {
     return last180DaysTrips.map((trip, index) => (
       <li key={index} className={classes["trip__list"]}>
         <div className={classes["trip__container"]}>
-          <span className={classes["trip__start-date"]}>
-            {formatDate(trip.startDate, months)}
-          </span>
-          <span className={classes["trip__total-days"]}>{`${countDays(
-            trip
-          )} days`}</span>
-          <span className={classes["trip_end-date"]}>
-            {formatDate(trip.endDate, months)}
-          </span>
+          <div className={classes["trip_details"]}>
+            <div className={classes["trip_country"]}>
+              <div className={classes["trip_flag"]}>
+                <ReactCountryFlag
+                  countryCode={
+                    schengenCountries.find(
+                      (country) => country.name === trip.country
+                    )?.code || ""
+                  }
+                  svg
+                />
+              </div>
+              <div className={classes["trip_country-name"]}>{trip.country}</div>
+            </div>
+            <div className={classes["trip_date"]}>
+              <span className={classes["trip__start-date"]}>
+                {formatDate(trip.startDate, months)}
+              </span>
+              -
+              <span className={classes["trip_end-date"]}>
+                {formatDate(trip.endDate, months)}
+              </span>
+            </div>
+
+            <span className={classes["trip__total-days"]}>{`${countDays(
+              trip
+            )} days`}</span>
+          </div>
           <div className={classes["edit-delete_container"]}>
             <DropdownMenu
               items={getDropdownItems(trip.id)}
@@ -141,6 +163,7 @@ const TripList: React.FC = () => {
             id: doc.id,
             startDate: new Date(tripData.startDate),
             endDate: new Date(tripData.endDate),
+            country: tripData.country,
           });
         });
         tripsData.sort((a, b) => b.startDate.getTime() - a.startDate.getTime());

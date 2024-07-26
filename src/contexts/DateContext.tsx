@@ -6,7 +6,9 @@ interface DateContextProps {
   setStartDate: (date: Date | null) => void;
   setEndDate: (date: Date | null) => void;
   handleDayClick: (date: Date | null) => void;
-  cancelSelectedDates: () => void;
+  cancelSelectedTrip: () => void;
+  selectedCountry: string;
+  setSelectedCountry: (country: string) => void;
 }
 
 const DateContext = createContext<DateContextProps | undefined>(undefined);
@@ -16,6 +18,7 @@ export const DateProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
+  const [selectedCountry, setSelectedCountry] = useState<string>("");
 
   const handleDayClick = (date: Date | null) => {
     if (!date) return;
@@ -32,9 +35,10 @@ export const DateProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  const cancelSelectedDates = () => {
+  const cancelSelectedTrip = () => {
     setStartDate(null);
     setEndDate(null);
+    setSelectedCountry("");
   };
 
   return (
@@ -45,7 +49,9 @@ export const DateProvider: React.FC<{ children: ReactNode }> = ({
         setStartDate,
         setEndDate,
         handleDayClick,
-        cancelSelectedDates,
+        cancelSelectedTrip,
+        selectedCountry,
+        setSelectedCountry,
       }}
     >
       {children}
